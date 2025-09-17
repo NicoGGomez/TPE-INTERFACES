@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+body {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    background-color: var(--color-primario-luces);
+}
+
+
+:root {
+    --color-primario: #0F1171;
+    --color-primario-luces: #1E21B9;
+    --color-primario-sombra: #070832;
+
+    --color-acento: #4DDDE8;
+    --color-acento-luces: #4DDDE8;
+    --color-acento-sombra: #3B9096;
+
+    --color-secundario: #15FA00;
+    --color-secundario-luces: #83FF78;
+    --color-secundario-sombra: #0B8700;  
+
+    --fuente-texto: 'Orbitron', sans-serif;
+}
