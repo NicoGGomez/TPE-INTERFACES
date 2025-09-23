@@ -1,4 +1,5 @@
 .contenedor-menu-hamburguesa {
+    position: absolute;
     display: none;
     flex-direction: column;
     align-items: center;

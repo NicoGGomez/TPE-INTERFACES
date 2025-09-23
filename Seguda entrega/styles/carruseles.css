@@ -1,0 +1,44 @@
+.contenedor-carrusel-principal {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 6vh;
+}
+
+.carrusel-principal {
+    background-color: var(--color-primario-sombra);
+    width: 90%;
+    height: 40vh;
+}
+
+.contenedor-carruseles-seccion {
+    margin-top: 5vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.contenedor-carrusel-seccion {
+    display: flex;
+    flex-direction: column;
+}
+
+.contenedor-carrusel-seccion .cards {
+    display: flex;
+    gap: 20px;
+}
+
+.cards .card {
+    background-color: var(--color-primario-sombra);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.card .contenedor-info-card {
+    display: flex;
+}
+
+.card .contenedor-info-card button {
+    display: flex;
+    background-color: ;
+}

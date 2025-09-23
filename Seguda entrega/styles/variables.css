@@ -5,6 +5,8 @@ body {
     margin: 0;
     box-sizing: border-box;
     background-color: var(--color-primario-luces);
+    font-family: var(--fuente-texto);
+    color: var(--color-secundario);
 }
 
 
