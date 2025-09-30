@@ -98,7 +98,7 @@
 
     .contenedor-carrusel .cards {
     display: flex;
-    overflow-x: auto;  
+    /* overflow-x: auto;   */
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     }
