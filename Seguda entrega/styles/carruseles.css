@@ -12,33 +12,95 @@
 }
 
 .contenedor-carruseles-seccion {
-    margin-top: 5vh;
     width: 100%;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
 }
 
 .contenedor-carrusel-seccion {
     display: flex;
+    align-items: center;
     flex-direction: column;
+    margin: 30px 0 30px 0 ;
+}
+
+.contenedor-carrusel-seccion .contenedor-titulo {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.contenedor-carrusel {
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+    gap: 10px;
+    width: 80%;
+    position: relative;
+    overflow: hidden; 
+}
+
+.contenedor {
+    display: flex;
+    width: 90%;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.contenedor-flecha { 
+    cursor: pointer;
 }
 
 .contenedor-carrusel-seccion .cards {
     display: flex;
     gap: 20px;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
 }
 
 .cards .card {
     background-color: var(--color-primario-sombra);
     padding: 10px;
     border-radius: 10px;
+    transition: 0.2s;
+    scroll-snap-align: center;
+}
+
+.cards .card:hover { 
+    transform: scale(103%);
+    transition: 0.2s;
+}
+
+.cards .card a {
+    text-decoration: none;
+    color: var(--color-secundario);
 }
 
 .card .contenedor-info-card {
     display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.card .contenedor-info-card button {
+.card .contenedor-info-card img {
+    width: 30px;
+    height: 30px;
+}
+
+@media (max-width: 600px) {
+    .contenedor-carrusel {
+    position: relative;
+    overflow: hidden; 
+    } 
+
+    .contenedor-carrusel .cards {
     display: flex;
-    background-color: ;
+    overflow-x: auto;  
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    }
+
 }

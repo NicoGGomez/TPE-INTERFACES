@@ -1,7 +1,7 @@
 nav {
     background-color: var(--color-primario-sombra);
     display: grid;
-    grid-template-columns: 15% 70% 10%;
+    grid-template-columns: 10% 70% 10%;
     justify-content: space-between;
     align-items: center;
     padding: 3px 3px 3px -2px;
@@ -9,6 +9,12 @@ nav {
     font-size: 24px;
     font-family: var(--fuente-texto);
     font-weight: bold;
+    height: 80px;
+}
+
+nav a { 
+    text-decoration: none;
+    color: var(--color-secundario-luces);
 }
 
 nav li {
@@ -34,17 +40,11 @@ nav .contenedor-izq li a {
 
 nav .contenedor-titulo {
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 10px;
 }
 
 nav .contenedor-titulo img {
-    width: 56px;
-    margin-bottom: -10px;
-    margin-top: 2px;
-}
-
-nav .contenedor-der {
-
+    width: 50px;
 }
