@@ -1,7 +1,7 @@
 nav {
     background-color: var(--color-primario-sombra);
     display: grid;
-    grid-template-columns: 10% 70% 10%;
+    grid-template-columns: 6% auto 8%;
     justify-content: space-between;
     align-items: center;
     padding: 3px 3px 3px -2px;
@@ -30,6 +30,8 @@ nav .contenedor-izq {
 
 nav .contenedor-izq img {
     cursor: pointer;
+    width: 45px;
+    height: 45px;
 }
 
 nav .contenedor-izq li a {
@@ -47,4 +49,10 @@ nav .contenedor-titulo {
 
 nav .contenedor-titulo img {
     width: 50px;
+}
+
+nav .contenedor-der img {
+    cursor: pointer;
+    width: 48px;
+    height: 48px;
 }
