@@ -32,5 +32,4 @@ btnIzq.addEventListener('click', () => {
         carrusel.style.transform = `translateX(${desplazamiento}px)`;
         carrusel.style.transition = "transform 0.5s ease"; 
     }
-    alert(desplazamiento)
 });

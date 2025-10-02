@@ -25,9 +25,10 @@
 }
 
 .contenedor-carrusel-seccion .contenedor-titulo {
+    width: 85%;
     margin-bottom: 10px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .contenedor-carrusel {

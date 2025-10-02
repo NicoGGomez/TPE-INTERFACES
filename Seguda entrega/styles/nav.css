@@ -1,7 +1,7 @@
 nav {
     background-color: var(--color-primario-sombra);
     display: grid;
-    grid-template-columns: 6% auto 8%;
+    grid-template-columns: 244px auto 244px;
     justify-content: space-between;
     align-items: center;
     padding: 3px 3px 3px -2px;
@@ -23,7 +23,7 @@ nav li {
 
 nav .contenedor-izq {
     display: flex;
-    justify-content: center;
+    padding-left: 30px;
     align-items: center;
     gap: 10px;
 }
@@ -49,6 +49,12 @@ nav .contenedor-titulo {
 
 nav .contenedor-titulo img {
     width: 50px;
+}
+
+nav .contenedor-der {
+    display: flex;
+    justify-content: end;
+    margin-right: 30px;
 }
 
 nav .contenedor-der img {

@@ -1,0 +1,46 @@
+.contenedor-seccion-juego {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.contenedor-seccion-juego .contenedor-juego img {
+    width: 1200px;
+}
+
+.contenedor-info-juego {
+    display: flex;
+    flex-direction: column;
+    width: 1200px;
+    background-color: var(--color-primario-sombra);
+}
+
+.contenedor-info-juego .contenedor-arriba {
+    display: grid;
+    grid-template-columns: auto 10%;
+    margin: 10px;
+}
+
+.contenedor-info-juego .contenedor-arriba .contenedor-redes {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.contenedor-info-juego .contenedor-arriba .contenedor-redes img {
+    width: 30px;
+    height: 30px;
+}
+
+.contenedor-info-juego .contenedor-medio {
+    margin: 0 10px 0 10px;
+}
+
+.contenedor-info-juego .contenedor-abajo {
+    margin: 0 10px 10px 10px;
+    display: flex;
+    justify-content: end;
+    gap: 12px;
+    padding-right: 10px;
+}

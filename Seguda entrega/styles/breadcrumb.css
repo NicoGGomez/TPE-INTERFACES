@@ -1,0 +1,19 @@
+.contenedor-bd {
+    display: flex;
+    justify-content: center;
+}
+
+.contenedor-breadcrumb {
+    width: 1200px;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 6px;
+}
+
+.contenedor-breadcrumb a {
+    text-decoration: none;
+    color: var(--color-acento);
+    font-weight: bold;
+}

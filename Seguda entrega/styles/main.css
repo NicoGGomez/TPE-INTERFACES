@@ -1,4 +1,8 @@
 @import "variables.css";
 @import "nav.css";
 @import "menuHamburguesa.css";
-@import "carruseles.css"
+@import "carruseles.css";
+@import "footer.css";
+
+@import "breadcrumb.css";
+@import "juego.css";
