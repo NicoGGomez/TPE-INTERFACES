@@ -1,0 +1,18 @@
+.contenedor-reg{
+    margin: 60px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.contenedor-reg .contenedor-captcha {
+    display: flex;
+    justify-content: center;
+} 
+
+.contenedor-reg form img {
+    height: 60px;
+    width: 250px;
+} 
