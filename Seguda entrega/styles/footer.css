@@ -64,3 +64,15 @@ footer .contenedor-links {
     flex-direction: column;
     gap: 8px;
 }
+
+@media (max-width: 600px) {
+footer {
+    background-color: var(--color-primario-sombra);
+    grid-template-columns: auto;
+}
+
+footer .contenedor {
+    display: none;
+}
+
+}

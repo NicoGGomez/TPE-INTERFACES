@@ -6,9 +6,15 @@
 }
 
 .carrusel-principal {
-    background-color: var(--color-primario-sombra);
+    /* background-color: var(--color-primario-sombra); */
+    display: flex;
+    justify-content: center;
     width: 90%;
-    height: 40vh;
+}
+
+.carrusel-principal img {
+    /* width: 90%; */
+    height: 45vh;   
 }
 
 .contenedor-carruseles-seccion {

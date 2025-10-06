@@ -4,6 +4,9 @@
 @import "menuHamburguesa.css";
 @import "footer.css";
 
+/* loader */
+@import "loader.css";
+
 /* inicio */
 @import "carruseles.css";
 
