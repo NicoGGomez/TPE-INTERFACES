@@ -53,7 +53,9 @@ nav .contenedor-titulo img {
 
 nav .contenedor-der {
     display: flex;
+    gap: 20px;
     justify-content: end;
+    align-items: center;
     margin-right: 30px;
 }
 

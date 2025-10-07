@@ -77,6 +77,10 @@ form .contenedor-boton button:hover {
     justify-content: center;
 }
 
+.contenedor-comentario .contenedor-img img {
+    width: 60px;
+}
+
 .contenedor-mas {
     background-color: var(--color-primario-sombra);
     width: 1200px;
