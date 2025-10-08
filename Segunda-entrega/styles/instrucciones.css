@@ -15,3 +15,12 @@
 .contenedor-instrucciones .contenedor-texto {
     padding: 0 10px 10px 10px;
 }
+
+@media (max-width: 600px) {
+
+.contenedor-instrucciones {
+    width: 100%;
+}
+
+
+}

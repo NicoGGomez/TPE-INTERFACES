@@ -62,3 +62,23 @@
     transform: scale(120%);
     transition: .1s;
 }
+
+@media (max-width: 600px) {
+
+.contenedor-seccion-juego .contenedor-juego img {
+    width: 100%;
+}
+
+.contenedor-info-juego {
+    width: 100%;
+}
+
+.contenedor-medio {
+    width: 1000%;
+}
+
+.contenedor-info-juego .contenedor-arriba .contenedor-redes {
+    display: none;
+}
+
+}

@@ -97,6 +97,18 @@ form .contenedor-boton button:hover {
     font-weight: bold;
 }
 
+.contenedor-comentario .contenedor-texto {
+    display: inline-flex; /* o inline-flex / inline-grid */
+    width: auto;
+    height: auto;
+}
+
+.contenedor-comentario .contenedor-texto p{
+  white-space: normal;  /* permite saltos de línea */
+  word-wrap: break-word; /* evita que se salga del contenedor */
+
+}
+
 .contenedor-comentario .contenedor-responder {
     cursor: pointer;
 }
@@ -113,5 +125,28 @@ form .contenedor-boton button:hover {
 .contenedor-comentario .contenedor-opinion img:hover {
     transform: scale(120%);
     transition: .1s;
+}
+
+@media (max-width: 600px) {
+
+.contenedor-comentarios .contenedor-dejar-comentario {
+    width: 100%;
+}
+
+.contenedor-comentario {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 20% 60% 10%;
+    gap: 20px;
+}
+
+.contenedor-comentario .contenedor-opinion img {
+    padding-right: 20px;
+}
+
+.contenedor-mas {
+    width: 100%;
+}
+
 }
 
