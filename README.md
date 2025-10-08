@@ -3,6 +3,11 @@ TPE Interfaces
 
 Este repositorio contiene el desarrollo del Trabajo Práctico Especial (TPE) de la materia Interfaces de Usuario.
 
+🚀 GitHub Pages (https://nicoggomez.github.io/TPE-INTERFACES/)
+
+El proyecto está publicado mediante GitHub Pages, lo que permite acceder al sitio desde cualquier navegador sin necesidad de instalar nada.
+Al abrir el enlace de GitHub Pages, se carga automáticamente el archivo index.html ubicado en la raíz del repositorio.
+
 📁 Estructura del proyecto
 
 🔹 primer-entrega/ → versión inicial del sitio, con las primeras maquetaciones en HTML y CSS.
@@ -18,7 +23,5 @@ Carpeta scripts/ con archivos JavaScript
 
 Carpeta styles/ con los estilos principales del sitio
 
-🚀 GitHub Pages
 
-El proyecto está publicado mediante GitHub Pages, lo que permite acceder al sitio desde cualquier navegador sin necesidad de instalar nada.
-Al abrir el enlace de GitHub Pages, se carga automáticamente el archivo index.html ubicado en la raíz del repositorio.
+
