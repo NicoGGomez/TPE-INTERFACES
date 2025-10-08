@@ -32,6 +32,12 @@
     width: 30px;
     height: 30px;
     cursor: pointer;
+    transition: .1s;
+}
+
+.contenedor-info-juego .contenedor-arriba .contenedor-redes img:hover {
+    transform: scale(120%);
+    transition: .1s;
 }
 
 .contenedor-info-juego .contenedor-medio {
@@ -44,4 +50,15 @@
     justify-content: end;
     gap: 12px;
     padding-right: 10px;
+}
+
+.contenedor-abajo img {
+    cursor: pointer;
+    transition: .1s;
+
+}
+
+.contenedor-abajo img:hover {
+    transform: scale(120%);
+    transition: .1s;
 }

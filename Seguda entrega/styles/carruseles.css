@@ -86,12 +86,16 @@
     /* width: auto; */
 }
 
-.cards .card {
+.cards .card, .card-pago {
     background-color: var(--color-primario-sombra);
     padding: 10px;
     border-radius: 10px;
     transition: 0.1s;
     scroll-snap-align: center;
+}
+
+.cards .card-pago:hover {
+    background-color: var(--color-secundario);
 }
 
 .cards .card:hover { 
@@ -104,7 +108,24 @@
     color: var(--color-secundario);
 }
 
+.cards .card-pago a {
+    text-decoration: none;
+    color: var(--color-secundario);
+}
+
+.cards .card-pago a:hover {
+    text-decoration: none;
+    color: var(--color-primario-sombra);
+    font-weight: bold;
+}
+
 .card .contenedor-info-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-pago .contenedor-info-card {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -123,7 +144,6 @@
 
     .contenedor-carrusel .cards {
     display: flex;
-    /* overflow-x: auto;   */
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     }

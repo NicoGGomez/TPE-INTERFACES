@@ -6,12 +6,31 @@
     align-items: center;
 }
 
-.contenedor-form {
+.contenedor-form-login {
     background-color: var(--color-primario-sombra);
     display: flex;
 }
 
-.contenedor-form form {
+.contenedor-form-login .contenedor-redes {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.contenedor-form-login .contenedor-redes img {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: .1s;
+}
+
+.contenedor-form-login .contenedor-redes img:hover {
+    transform: scale(120%);
+    transition: .1s;
+}
+
+
+.contenedor-form-login form {
     width: 370px;
     display: flex;
     flex-direction: column;
@@ -31,7 +50,7 @@
     margin: 10px 0 10px 0;
 }
 
-.contenedor-form form .contenedor-links a {
+.contenedor-form-login form .contenedor-links a {
     text-decoration: none;
     color: var(--color-acento);
     font-size: 15px;
@@ -39,7 +58,7 @@
 }
 
 
-.contenedor-form form input {
+.contenedor-form-login form input {
     height: 30px;
     background-color: var(--color-primario-sombra);
     border: 1px solid white;
@@ -47,7 +66,7 @@
     color: var(--color-acento);
 }
 
-.contenedor-form form button {
+.contenedor-form-login form button {
     height: 30px;
     background-color: var(--color-secundario);
     border: 1px solid white;
@@ -58,16 +77,12 @@
     transition: .2s;
 }
 
-.contenedor-form form button:hover {
+.contenedor-form-login form button:hover {
     height: 30px;
     background-color: var(--color-primario-sombra);
-    border: 1px solid white;
+    border: 1px solid var(--color-secundario);
     border-radius: 8px;
     transition: .2s;
-}
-
-.contenedor-form form button a {
-    font-weight: bold;
-    text-decoration: none;
     cursor: pointer;
+    color: var(--color-secundario);
 }

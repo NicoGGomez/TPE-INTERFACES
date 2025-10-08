@@ -1,9 +1,11 @@
-const carrusel = document.querySelector('.cards')
-const card = document.getElementById('card')
-const btnIzq = document.getElementById('btn-izq')
-const btnDer = document.getElementById('btn-der')
+const carruseles = document.querySelectorAll('.cards')
 
-let desplazamiento = 0; 
+carruseles.forEach((carrusel, index) => {
+  const btnIzq = document.getElementById(`btn-izq-${index}`);
+  const btnDer = document.getElementById(`btn-der-${index}`);
+  const card = carrusel.querySelector('.card');
+
+  let desplazamiento = 0; 
 const anchoCard = card.offsetWidth; // 206.25 
 
 
@@ -33,3 +35,4 @@ btnIzq.addEventListener('click', () => {
         carrusel.style.transition = "transform 0.5s ease"; 
     }
 });
+})

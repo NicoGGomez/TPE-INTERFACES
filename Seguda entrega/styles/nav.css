@@ -72,4 +72,8 @@ nav {
     grid-template-columns: 24px auto 24px;
 }
 
+nav .carrito {
+    display: none;
+}
+
 }

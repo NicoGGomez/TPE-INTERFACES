@@ -93,3 +93,25 @@ form .contenedor-boton button:hover {
     font-weight: bold;
 }
 
+.contenedor-comentario .contenedor-nombre{
+    font-weight: bold;
+}
+
+.contenedor-comentario .contenedor-responder {
+    cursor: pointer;
+}
+
+.contenedor-comentario .contenedor-responder:hover {
+    font-weight: bold;
+}
+
+.contenedor-comentario .contenedor-opinion img {
+    cursor: pointer;
+    transition: .1s;
+}
+
+.contenedor-comentario .contenedor-opinion img:hover {
+    transform: scale(120%);
+    transition: .1s;
+}
+
