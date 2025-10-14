@@ -21,7 +21,7 @@
 .carrusel-principal .contenedor-play img {
     height: 10vh; 
     position: absolute;
-    z-index: 10000;
+    z-index: 90;
     display: flex;
     top: 50%;
     left: 50%;
