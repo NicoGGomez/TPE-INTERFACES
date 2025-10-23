@@ -76,81 +76,6 @@
             </div>
         </div>
 
-        <!-- FORMULARIO PERSONAJES Y MODO -->
-                                
-        <div id="juego" class="juego-ejecucion">
-
-            <form action="" id="forms" class="form-juego">
-
-                <div class="container">
-
-                <h3>Personaliza tu juego!</h3>
-
-                <div class="container-niveles">
-                    <h3>Niveles</h3>          
-                    <div class="contenedor-niveles">
-                            <div class="opcion" id="nivelUno">
-                            <input class="seleccion-nivel" type="radio" name="enlinea" value="1" id="uno" required>
-                            <label class="txtbtn" for="uno">Nivel 1</label>
-                            </div>
-                            <div class="opcion" id="nivelDos">
-                            <input class="seleccion-nivel" type="radio" name="enlinea" value="2" id="dos" required>
-                            <label class="txtbtn" for="dos">Nivel 2</label>
-                            </div>
-                            <div class="opcion" id="nivelTres">
-                            <input class="seleccion-nivel" type="radio" name="enlinea" value="3" id="tres" required>
-                            <label class="txtbtn" for="tres">Nivel 3</label>
-                            </div>
-                            <div class="opcion" id="nivelCuatro">
-                            <input class="seleccion-nivel" type="radio" name="enlinea" value="4" id="cuatro" required>
-                            <label class="txtbtn" for="cuatro">Nivel 4</label>
-                            </div>
-                    </div>
-                </div>
-    
-                <div class="seleccion-juego">
-                    <h3>Dificultad</h3>
-                    <div class="contenedor-dificultad">
-                        <div class="opcion" id="4">
-                        <input class="seleccion-input" type="radio" name="enlinea" value="4" id="4fichas" required>
-                        <label class="txtbtn" for="4fichas">4 fichas</label>
-                    </div>
-
-                    <div class="opcion" id="5">
-                        <input class="seleccion-input" type="radio" name="enlinea" value="5" id="5fichas">
-                        <label class="txtbtn" for="5fichas">5 fichas</label>            
-                    </div>
-
-                    <div class="opcion" id="6">
-                        <input class="seleccion-input" type="radio" name="enlinea" value="6" id="6fichas">
-                        <label class="txtbtn" for="6fichas">6 fichas</label>            
-                    </div>
-                    </div>
-                </div>
-
-                <div class="opciones">
-                <button id="volver" class="btn">Volver</button>
-
-                <button class="btn-primario txtbtn" id="btn-listo-para-jugar" type="submit">jugar</button> 
-                </div>
-
-                </div>
-
-            </form>
-
-        </div>
-
-        <div id="juego-pantalla" class="juegop">
-            <div class="info-play">
-                <h2 id="mostrar-jugador" class="mostrar-jugador titulo-h2"></h2>
-                <div id="temporizador" class="temporizador txtbtn"></div>
-                <button id="reiniciar" class="btn-primario txtbtn reiniciar">Reiniciar</button>   
-            </div> 
-
-            <div id="ganador" class="ganador titulo-h2"></div>
-            <canvas id="canvas" width="1200" height="600"></canvas>
-        </div>  
-
         <div id="pantalla-juego-principal" class="pantalla-activa">
                 <div class="img">
                                         
@@ -169,11 +94,58 @@
 
                 </div>
         </div>
+
+        <!-- FORMULARIO PERSONAJES Y MODO -->
+                                
+        <div id="solitario" class="juego-ejecucion">
+
+            <form id="panel">
+                <label for="">Seleccione el rompecabezas</label>
+                <div class="contenedor-imgs">
+                <img id="imagen1" src="imgs/img1/img1.png" alt="">
+                <img id="imagen2" src="imgs/img2/img2.png" alt="">
+                <img id="imagen3" src="imgs/img3/img3.png" alt="">
+                <img id="imagen4" src="imgs/img4/img4.png" alt="">
+                </div>
+                <button id="btn-img-volver">volver al menu principal</button>
+            </form>
+
+        </div>
+
+        <div id="solitario-piezas" class="juego-ejecucion-piezas">
+
+            <form id="panel-piezas">
+                <label>Dificultad:</label>
+                <label><input type="radio" name="size" value="2" checked> 2 x 2</label>
+                <label><input type="radio" name="size" value="3"> 3 x 3</label>
+                <label><input type="radio" name="size" value="4"> 4 x 4</label>
+                <button class="btn-primario" id="btn-listo-para-jugar" type="submit">Iniciar</button>
+            </form>
+
+        </div>
+
+        <div id="juego-pantalla" class="juegop"> 
+
+            <div class="contenedor-canvas">
+                <p id="timer" style="font-weight:bold; color:white; margin-bottom:10px;">⏱️ Tiempo: 0s</p>
+                <canvas id="canvas" width="400" height="400"></canvas>
+                <div class="contenedor-opciones">
+                    <button id="salir">Salir</button>
+                    <button id="mezclar">Mezclar</button>
+                </div>
+            </div>
+
+        </div>   
                                 
         <div id="pantalla-multijugador" class="multijugador">
                 <div class="container">
                     <p>Proximamente</p>
                 </div>
+        </div>
+
+        <div id="ganador" class="contenedor-ganador">
+            <div id="miDiv"></div>
+            <button id="btn-volver">volver al menu principal</button>
         </div>
 
     <div class="contenedor-info-juego">
@@ -207,8 +179,6 @@
             </div>
     </div>
     </div>
-    
-    
 
     <div class="contenedor-comentarios">
 
@@ -375,6 +345,7 @@
     <script src="../Segunda-entrega/scripts/juego/juego.js"></script>
     <script src="../Segunda-entrega/scripts/menuHamburguesa.js"></script>
     <script src="../Segunda-entrega/scripts/juego.js"></script>
+    <!-- <script src="../Segunda-entrega/scripts/juegop.js"></script> -->
 
     <script src="juego/cuatroEnLinea.js"></script>
     <script src="juego/Figure.js"></script>

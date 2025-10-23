@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rompecabezas JS</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(120deg, #0a0a0a, #1b1b1b);
+      color: white;
+    }
+
+    .pantalla {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 20px;
+    }
+
+    .mostrar {
+      display: flex;
+    }
+
+    button {
+      padding: 12px 20px;
+      background-color: #00bcd4;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #0097a7;
+    }
+
+    canvas {
+      border: 3px solid white;
+      border-radius: 12px;
+      background-image: url('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e');
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+    }
+
+    #mensaje {
+      margin-top: 20px;
+      font-size: 1.4rem;
+      color: #00ff9d;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Pantalla de inicio -->
+  <div id="pantalla-inicio" class="pantalla mostrar">
+    <h1>🧩 Rompecabezas</h1>
+    <button id="btn-jugar">Jugar</button>
+  </div>
+
+  <!-- Pantalla de configuración -->
+  <div id="pantalla-config" class="pantalla">
+    <h2>Elegí dificultad</h2>
+    <form id="config-form">
+      <label><input type="radio" name="size" value="2" checked> Fácil (2x2)</label><br>
+      <label><input type="radio" name="size" value="3"> Medio (3x3)</label><br>
+      <label><input type="radio" name="size" value="4"> Difícil (4x4)</label><br><br>
+      <button type="submit">Comenzar</button>
+    </form>
+    <button id="btn-volver-menu">Volver</button>
+  </div>
+
+  <!-- Pantalla del juego -->
+  <div id="pantalla-juego" class="pantalla">
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <div id="mensaje"></div>
+    <button id="btn-reiniciar">Reiniciar</button>
+  </div>
+
+  <script>
+    class Puzzle {
+      constructor(canvas, gridSize = 3, imageUrl = 'https://picsum.photos/500') {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.gridSize = gridSize;
+        this.image = new Image();
+        this.image.src = imageUrl;
+        this.pieces = [];
+        this.tileSize = canvas.width / gridSize;
+        this.empty = { x: gridSize - 1, y: gridSize - 1 };
+        this.messageEl = document.getElementById("mensaje");
+        this.image.onload = () => this.inicializar();
+        this.canvas.addEventListener('click', (e) => this.click(e));
+      }
+
+      inicializar() {
+        this.pieces = [];
+        for (let y = 0; y < this.gridSize; y++) {
+          for (let x = 0; x < this.gridSize; x++) {
+            this.pieces.push({ x, y });
+          }
+        }
+        this.pieces.pop(); // quita el último (espacio vacío)
+        this.shuffle();
+        this.dibujar();
+      }
+
+      shuffle() {
+        for (let i = this.pieces.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [this.pieces[i], this.pieces[j]] = [this.pieces[j], this.pieces[i]];
+        }
+      }
+
+      getPieceAt(x, y) {
+        return this.pieces.find(p => p.posX === x && p.posY === y);
+      }
+
+      click(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) / this.tileSize);
+        const y = Math.floor((e.clientY - rect.top) / this.tileSize);
+        this.mover(x, y);
+      }
+
+      mover(x, y) {
+        const dx = Math.abs(x - this.empty.x);
+        const dy = Math.abs(y - this.empty.y);
+        if ((dx + dy) === 1) {
+          const pieza = this.pieces.find(p => p.posX === x && p.posY === y);
+          if (pieza) {
+            [pieza.posX, pieza.posY, this.empty.x, this.empty.y] =
+              [this.empty.x, this.empty.y, x, y];
+            this.dibujar();
+            if (this.verificarGanador()) {
+              this.messageEl.textContent = "🎉 ¡Completado!";
+            }
+          }
+        }
+      }
+
+      dibujar() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        let i = 0;
+        for (let y = 0; y < this.gridSize; y++) {
+          for (let x = 0; x < this.gridSize; x++) {
+            const pieza = this.pieces[i];
+            if (pieza && (pieza.posX !== this.empty.x || pieza.posY !== this.empty.y)) {
+              this.ctx.drawImage(
+                this.image,
+                pieza.x * this.tileSize,
+                pieza.y * this.tileSize,
+                this.tileSize,
+                this.tileSize,
+                pieza.posX * this.tileSize,
+                pieza.posY * this.tileSize,
+                this.tileSize,
+                this.tileSize
+              );
+            }
+            i++;
+          }
+        }
+      }
+
+      verificarGanador() {
+        return this.pieces.every(p => p.x === p.posX && p.y === p.posY);
+      }
+    }
+
+    // Manejo de pantallas
+    const inicio = document.getElementById("pantalla-inicio");
+    const config = document.getElementById("pantalla-config");
+    const juego = document.getElementById("pantalla-juego");
+    const btnJugar = document.getElementById("btn-jugar");
+    const btnVolver = document.getElementById("btn-volver-menu");
+    const btnReiniciar = document.getElementById("btn-reiniciar");
+    const form = document.getElementById("config-form");
+    const canvas = document.getElementById("canvas");
+    let puzzle;
+
+    btnJugar.onclick = () => {
+      inicio.classList.remove("mostrar");
+      config.classList.add("mostrar");
+    };
+
+    btnVolver.onclick = () => {
+      config.classList.remove("mostrar");
+      inicio.classList.add("mostrar");
+    };
+
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const size = parseInt(new FormData(form).get("size"));
+      config.classList.remove("mostrar");
+      juego.classList.add("mostrar");
+      puzzle = new Puzzle(canvas, size);
+    };
+
+    btnReiniciar.onclick = () => {
+      puzzle.inicializar();
+      document.getElementById("mensaje").textContent = "";
+    };
+  </script>
+</body>
+</html>
