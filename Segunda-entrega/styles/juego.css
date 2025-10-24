@@ -288,7 +288,7 @@ canvas {
 
 #panel .contenedor-imgs {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 15px;
     justify-content: center;
     align-items: center;
@@ -298,6 +298,7 @@ canvas {
 
 #panel .contenedor-imgs img{
     height: 200px;
+    width: 200px;
 }
 
 #panel .contenedor-imgs img:hover{
@@ -316,14 +317,51 @@ canvas {
 
 /* JUEGO ACTIVO MULTIJUGADOR */
 
+.instrucciones {
+    background-image: url(../imgs/juego-reproduciendo.png);
+    background-size: cover;
+    width: 1200px;
+    height: 600px;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.instrucciones .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 40px;
+    margin: 20px;
+    color: #fff;
+    user-select: none;
+}
+
+.instrucciones .container p {
+    color: #fff;
+}
+
+.instrucciones .container .contenedor-texto {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 .multijugador {
     background-image: url(../imgs/juego-reproduciendo.png);
     background-size: cover;
     width: 1200px;
     height: 600px;
     display: none;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 20px;
 }
 
 .multijugador .container {
@@ -363,7 +401,7 @@ canvas {
     user-select: none;
 }
 
-#btn-volver, #btn-img-volver, .btn-pieza-volver, #salir, #mezclar{
+#btn-volver, #btn-img-volver, .btn-pieza-volver, #salir, #mezclar, #volver-instrucciones, #volver-multijugador{
     padding: 10px;
     background: none;
     border: none;
@@ -375,7 +413,7 @@ canvas {
     user-select: none;
 }
 
-#btn-volver:hover, #btn-img-volver:hover , .btn-pieza-volver:hover, #salir:hover, #mezclar:hover{
+#btn-volver:hover, #btn-img-volver:hover , .btn-pieza-volver:hover, #salir:hover, #mezclar:hover, #volver-instrucciones:hover, #volver-multijugador:hover{
     padding: 10px;
     background-color: rgba(0, 0, 0, 0.8);
     color: #ffffff;
