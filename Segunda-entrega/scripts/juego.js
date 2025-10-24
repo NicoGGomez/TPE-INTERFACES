@@ -144,6 +144,7 @@ class PuzzleGame {
 
 loadLevel() {
     this.isActive = true; 
+    this.stopTimer();
     // Guarda el tamaño base la primera vez
     if (!this.baseGridSize) this.baseGridSize = this.gridSize;
 
