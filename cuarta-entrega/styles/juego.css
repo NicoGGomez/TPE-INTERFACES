@@ -1,0 +1,453 @@
+.contenedor-seccion-juego {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+}
+
+.contenedor-info-juego {
+    display: flex;
+    flex-direction: column;
+    width: 1200px;
+    background-color: var(--color-primario-sombra);
+}
+
+.contenedor-info-juego .contenedor-arriba {
+    display: grid;
+    grid-template-columns: auto 10%;
+    margin: 10px;
+}
+
+.contenedor-info-juego .contenedor-arriba .contenedor-redes {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.contenedor-info-juego .contenedor-arriba .contenedor-redes img {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    transition: .1s;
+}
+
+.contenedor-info-juego .contenedor-arriba .contenedor-redes img:hover {
+    transform: scale(120%);
+    transition: .1s;
+}
+
+.contenedor-info-juego .contenedor-medio {
+    margin: 0 10px 0 10px;
+}
+
+.contenedor-info-juego .contenedor-abajo {
+    margin: 0 10px 10px 10px;
+    display: flex;
+    justify-content: end;
+    gap: 12px;
+    padding-right: 10px;
+}
+
+.contenedor-abajo img {
+    cursor: pointer;
+    transition: .1s;
+
+}
+
+.contenedor-abajo img:hover {
+    transform: scale(120%);
+    transition: .1s;
+}
+
+@media (max-width: 600px) {
+
+.contenedor-seccion-juego .contenedor-juego .img {
+    width: 100vh;
+}
+
+.contenedor-info-juego {
+    width: 100%;
+}
+
+.contenedor-medio {
+    width: 1000%;
+}
+
+.contenedor-info-juego .contenedor-arriba .contenedor-redes {
+    display: none;
+}
+
+}
+
+.contenedor-seccion-juego .contenedor-juego .img {
+    width: 1200px;
+    height: 600px;
+    background-image: url('../imgs/juego-reproduciendo.png');
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-jugar {
+    padding: 10px 20px; 
+    background-color: #000; 
+    border: solid 2px var(); 
+    color: #ffffff; 
+    font-size: 16px; 
+    font-family: var(--fuente-texto);
+    cursor: pointer;
+    transition: all 0.3s ease; 
+    border-radius: 10px; 
+    z-index: 1; 
+    display: flex;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); /* Sombra suave */
+}
+
+.btn-jugar:hover {
+    background: linear-gradient(45deg, var(--color-secundario), var(--color-secundario-sombra));
+    color: #000;
+    border: solid 2px var();
+    transform: scale(1.1); 
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.5); 
+}
+
+.juego-ejecucion {
+    display: none;
+    justify-content: center;
+    background-image: url(../imgs/juego-reproduciendo.png);
+    width: 1200px;
+    height: 600px;
+}
+
+.pantalla-activa {
+    background-image: url(../imgs/juego-reproduciendo.png);
+    background-size: cover;
+    width: 1200px;
+    height: 600px;
+    display: none;
+    justify-content: center;
+}
+
+.pantalla-activa .pantalla-principal .titulo, .btn {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: translateY(50px);
+        animation: entrada 1s ease-out forwards;
+}
+
+@keyframes entrada {
+    0% {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pantalla-activa .pantalla-principal{
+    display: grid;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    margin-top: 20px;
+    height: 90%;
+    width: 350px;
+}
+
+.pantalla-activa .pantalla-principal img {
+    padding-top: 10px;
+    width: 200px;
+    user-select: none;
+}
+
+.pantalla-activa .pantalla-principal .opciones {
+    display: grid;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.pantalla-activa .pantalla-principal .opciones .btn {
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: .3s;
+    font-weight: bold;
+    font-size: 30px;
+    color: #fff;
+    user-select: none;
+}
+
+.pantalla-activa .pantalla-principal .opciones .btn:hover {
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    transition: .3s;
+    border-radius: 10px;
+    cursor: pointer;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+/* JUEGO ACTIVO (SOLO) */
+
+.juego-ejecucion form{
+    background-image: url(../imgs/fondo-juego.jpg);
+    background-size: cover;
+    width: 1200px;
+    height: 600px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+}
+
+.juego-ejecucion form label{ 
+    padding-bottom: 20px; 
+}
+
+.juego-ejecucion-piezas form{
+    background-image: url(../imgs/fondo-juego.jpg);
+    background-size: cover;
+    width: 1200px;
+    height: 600px;
+    display: none;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+    gap: 20px;
+    transition: .3s;
+    font-weight: bold;
+    font-size: 30px;
+    color: #fff;
+}
+
+.juego-ejecucion-piezas form label, input{
+    cursor: pointer;
+}
+
+.form-juego.ocultar {
+    display: none;
+}
+
+.juegop {
+    height: 600px;
+    display: none;
+}
+
+.juegop.mostrar {
+    display: flex;
+    width: 1200px;
+    height: 600px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: url(../imgs/fondo-juego.jpg);
+}
+
+.contenedor-canvas {
+    display: flex;
+    width: 1200px;
+    height: 600px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: url(../imgs/fondo-juego.jpg);
+    background-size: cover;
+}
+
+canvas { 
+  /* position: relative; */
+  display: flex;
+  width: 400px;
+  height: 400px;
+}
+
+#panel label {
+    margin-bottom: 20px;
+    transition: .3s;
+    font-weight: bold;
+    font-size: 30px;
+    color: #fff;
+}
+
+#panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#panel .contenedor-imgs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+
+#panel .contenedor-imgs img{
+    height: 200px;
+    width: 200px;
+}
+
+#panel .contenedor-imgs img:hover{
+    height: 200px;
+    cursor: pointer;
+    transform: scale(1.1); 
+    transition: .2s;
+
+}
+
+.juego-ejecucion .container {
+    width: 500px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* JUEGO ACTIVO MULTIJUGADOR */
+
+.instrucciones {
+    background-image: url(../imgs/juego-reproduciendo.png);
+    background-size: cover;
+    width: 1200px;
+    height: 600px;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.instrucciones .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 40px;
+    margin: 20px;
+    color: #fff;
+    user-select: none;
+}
+
+.instrucciones .container p {
+    color: #fff;
+}
+
+.instrucciones .container .contenedor-texto {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.multijugador {
+    background-image: url(../imgs/juego-reproduciendo.png);
+    background-size: cover;
+    width: 1200px;
+    height: 600px;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.multijugador .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    width: 500px;
+    height: 300px;
+}
+
+.multijugador .container p {
+    color: #fff;
+}
+
+#canvas {
+    background-color: #888;
+}
+  
+.contenedor-ganador {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 1200px;
+    height: 600px;
+    background-image: url(../imgs/pantalla-ganaste.png);
+}
+
+.contenedor-ganador p{
+    font-size: 40px;
+    transition: .3s;
+    font-weight: bold;
+    font-size: 30px;
+    color: #fff;
+    user-select: none;
+}
+
+#btn-volver, #btn-img-volver, .btn-pieza-volver, #salir, #mezclar, #volver-instrucciones, #volver-multijugador{
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: .3s;
+    font-weight: bold;
+    font-size: 30px;
+    color: #fff;
+    user-select: none;
+}
+
+#btn-volver:hover, #btn-img-volver:hover , .btn-pieza-volver:hover, #salir:hover, #mezclar:hover, #volver-instrucciones:hover, #volver-multijugador:hover{
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    transition: .3s;
+    border-radius: 10px;
+    cursor: pointer;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.btn-primario {
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: .3s;
+    font-weight: bold;
+    font-size: 30px;
+    color: #fff;
+    user-select: none;
+}
+
+.btn-primario:hover {
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    transition: .3s;
+    border-radius: 10px;
+    cursor: pointer;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.contenedor-opciones {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
