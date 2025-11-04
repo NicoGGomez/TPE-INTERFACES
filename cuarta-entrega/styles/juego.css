@@ -279,6 +279,10 @@ canvas {
     color: #fff;
 }
 
+.juego-ejecucion-piezas {
+    display: none;
+}
+
 #panel {
     display: flex;
     flex-direction: column;
@@ -286,27 +290,19 @@ canvas {
     align-items: center;
 }
 
-#panel .contenedor-imgs {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 15px;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
+
+#panel .contenedor-personajes {
+    display: flex;
+    gap: 20px;
 }
 
-
-#panel .contenedor-imgs img{
-    height: 200px;
-    width: 200px;
+#panel .contenedor-personajes .contenedor-pj {
+    display: flex;
+    flex-direction: column;
 }
 
-#panel .contenedor-imgs img:hover{
-    height: 200px;
-    cursor: pointer;
-    transform: scale(1.1); 
-    transition: .2s;
-
+#panel .contenedor-personajes img {
+    border-radius: 200px;
 }
 
 .juego-ejecucion .container {
@@ -381,6 +377,16 @@ canvas {
 #canvas {
     background-color: #888;
 }
+
+.contenedor-perdedor {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 1200px;
+    height: 600px;
+    background-image: url(../imgs/pantalla-perdiste.png);
+}
   
 .contenedor-ganador {
     display: none;
@@ -392,7 +398,7 @@ canvas {
     background-image: url(../imgs/pantalla-ganaste.png);
 }
 
-.contenedor-ganador p{
+.contenedor-ganador, .contenedor-perdedor p{
     font-size: 40px;
     transition: .3s;
     font-weight: bold;
@@ -401,7 +407,7 @@ canvas {
     user-select: none;
 }
 
-#btn-volver, #btn-img-volver, .btn-pieza-volver, #salir, #mezclar, #volver-instrucciones, #volver-multijugador{
+#btn-volver, #btn-img-volver, .btn-pieza-volver, #salir, #reiniciar, #volver-instrucciones, #volver-multijugador{
     padding: 10px;
     background: none;
     border: none;
@@ -413,7 +419,7 @@ canvas {
     user-select: none;
 }
 
-#btn-volver:hover, #btn-img-volver:hover , .btn-pieza-volver:hover, #salir:hover, #mezclar:hover, #volver-instrucciones:hover, #volver-multijugador:hover{
+#btn-volver:hover, #btn-img-volver:hover , .btn-pieza-volver:hover, #salir:hover, #reinicar:hover, #volver-instrucciones:hover, #volver-multijugador:hover{
     padding: 10px;
     background-color: rgba(0, 0, 0, 0.8);
     color: #ffffff;

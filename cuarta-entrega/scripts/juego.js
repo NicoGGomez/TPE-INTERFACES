@@ -1,378 +1,561 @@
-// ------------------- Pantallas y botones -------------------
-// Botón principal "Jugar" y pantallas de inicio/juego
+// ------------------- Pantallas y botones (igual que antes) -------------------
 const btnPlay = document.getElementById('btn-play');
 const pantallaJuegoInactivo = document.getElementById('pantalla-juego');
 const pantallaJuegoActivo = document.getElementById('pantalla-juego-principal');
 
-// Cuando se hace click en "Jugar", oculta la pantalla inicial y muestra el menú principal
-btnPlay.addEventListener('click', () => {
+btnPlay && btnPlay.addEventListener('click', () => {
     pantallaJuegoInactivo.style.display = 'none';
     pantallaJuegoActivo.style.display = 'flex';
 });
 
-// ------------------- Botones principales -------------------
 const btnJugarSolo = document.getElementById('solo');
 const btnMultijugador = document.getElementById('multijugador');
 const btnInstrucciones = document.getElementById('instrucciones');
-const btnVolverAtras = document.getElementById('btn-volver');
-const btnImgVolverAtras = document.getElementById('btn-img-volver');
-const btnSalir = document.getElementById('salir');
-const btnMezclar = document.getElementById('mezclar');
-
-// Botón "Mezclar" vuelve a cargar la imagen seleccionada
-btnMezclar.addEventListener('click', () => {
-    game.loadImage(url);
-}); 
-
-// Botón "Salir" vuelve a la pantalla de selección de modo
-btnSalir.addEventListener('click', () => {
-    pantallaSolo.style.display = 'flex';
-    pantallaJuego.style.display = 'none';
-});
-
-// ------------------- Pantallas -------------------
-const pantallaSolo = document.getElementById('solitario');
 const pantallaMultijugador = document.getElementById('pantalla-multijugador');
 const pantallaInstrucciones = document.getElementById('pantalla-instrucciones');
+const pantallaElegirPj = document.getElementById('solitario-piezas');
 const pantallaJuego = document.getElementById('juego-pantalla');
+const btnSalir = document.getElementById('salir');
 
-// ------------------- Instrucciones -------------------
-// Muestra la pantalla de instrucciones y botón para volver
-btnInstrucciones.addEventListener('click', () => {
+btnInstrucciones && btnInstrucciones.addEventListener('click', () => {
     pantallaJuegoActivo.style.display = 'none';
     pantallaInstrucciones.style.display = 'flex';
-    document.getElementById('volver-instrucciones').addEventListener('click', () => {
-        pantallaJuegoActivo.style.display = 'flex';
-        pantallaInstrucciones.style.display = 'none';
-    });
+});
+const volverInstrucciones = document.getElementById('volver-instrucciones');
+volverInstrucciones && volverInstrucciones.addEventListener('click', () => {
+    pantallaJuegoActivo.style.display = 'flex';
+    pantallaInstrucciones.style.display = 'none';
 });
 
-// ------------------- Multijugador -------------------
-// Muestra pantalla multijugador y botón para volver
-btnMultijugador.addEventListener('click', () => {
+btnMultijugador && btnMultijugador.addEventListener('click', () => {
     pantallaJuegoActivo.style.display = 'none';
     pantallaMultijugador.style.display = 'flex';
-    document.getElementById('volver-multijugador').addEventListener('click', () => {
-        pantallaJuegoActivo.style.display = 'flex';
-        pantallaMultijugador.style.display = 'none';
-    });
 });
-
-// ------------------- Solitario -------------------
-// Muestra pantalla de selección de imagen
-btnJugarSolo.addEventListener('click', () => {
-    pantallaJuegoActivo.style.display = 'none';
-    pantallaSolo.style.display = 'flex';
-});
-
-// ------------------- Selección de imagen -------------------
-const imag1 = document.getElementById('imagen1');
-const imag2 = document.getElementById('imagen2');
-const imag3 = document.getElementById('imagen3');
-const imag4 = document.getElementById('imagen4');
-const imag5 = document.getElementById('imagen5');
-const imag6 = document.getElementById('imagen6');
-
-// Botón "volver" desde la selección de imagen al menú principal
-btnImgVolverAtras.addEventListener('click', () => {
-    pantallaSolo.style.display = 'none';
+const volverMultijugador = document.getElementById('volver-multijugador');
+volverMultijugador && volverMultijugador.addEventListener('click', () => {
     pantallaJuegoActivo.style.display = 'flex';
+    pantallaMultijugador.style.display = 'none';
 });
 
-let url = null;
-
-// Asigna un evento a cada miniatura de imagen
-// Al hacer clic, guarda la URL y muestra el formulario para elegir tamaño
-[imag1, imag2, imag3, imag4, imag5, imag6].forEach((img, index) => {
-    const urls = [
-        'https://i.postimg.cc/YSVB7sLm/1.jpg',
-        'https://i.postimg.cc/0N31vBKK/2.jpg',
-        'https://i.postimg.cc/cJjGWbtn/3.jpg',
-        'https://i.postimg.cc/ZqgzmMvC/4.jpg',
-        'https://i.postimg.cc/MGTCpPXH/img5.jpg',
-        'https://i.postimg.cc/k540g1Dg/img6.jpg'
-    ];
-    img.addEventListener('click', () => {
-        url = urls[index];
-        pantallaSolo.style.display = 'none';
-        document.getElementById('panel-piezas').style.display = 'flex';
-    });
+btnJugarSolo && btnJugarSolo.addEventListener('click', () => {
+    pantallaJuegoActivo.style.display = 'none';
+    pantallaElegirPj.style.display = 'flex';
 });
 
-// ------------------- Formulario de tamaño -------------------
-// Toma el tamaño seleccionado, inicia el juego y carga el nivel
-const panelPiezas = document.getElementById('panel-piezas');
-panelPiezas.addEventListener('submit', function (e) {
+btnSalir && btnSalir.addEventListener('click', () => {
+    pantallaJuego.style.display = 'none';
+    pantallaJuegoActivo.style.display = 'flex';
+    clearInterval(timerInterval);
+    timerEl.textContent = "⏱️ Tiempo: 120s";
+});
+
+const panel = document.getElementById('panel');
+panel.addEventListener('submit', async (e) => {
     e.preventDefault();
-    panelPiezas.style.display = 'none';
+
+    const selected = panel.querySelector('input[name="pieza"]:checked');
+    // ocultar pantalla de selección
+    pantallaElegirPj.style.display = 'none';
     pantallaJuego.style.display = 'flex';
-    const grid = parseInt(new FormData(panelPiezas).get("size"));
-    game.gridSize = grid;
-    game.currentLevel = 1;
-    game.baseGridSize = null;
-    game.loadLevel();
+
+    // asignar el personaje seleccionado a las assets
+    const peg = new PegSolitaireGame();
+ 
+    if(selected.value === "ficha") 
+        peg.assets.urls.ficha = "https://i.postimg.cc/G3YB35w3/personaje1.jpg";
+    else if(selected.value === "ficha2") 
+        peg.assets.urls.ficha = "https://i.postimg.cc/KvQQQNGw/personaje2.jpg";
+
+    await peg.startGame(); // startGame ya carga la imagen y arranca el tablero
 });
 
-// ------------------- Clase PuzzleGame -------------------
-// Maneja toda la lógica del rompecabezas
-class PuzzleGame {
-    constructor(canvas, messageEl) {
-        this.isActive = true;
-        this.canvas = canvas;
-        this.ctx = canvas.getContext("2d");
-        this.messageEl = messageEl;
-        this.size = canvas.width;
-        this.gridSize = 2;
-        this.image = null;
-        this.pieces = [];
-        this.draggedPiece = null;
-        this.offset = { x: 0, y: 0 };
-        this.startTime = null;
-        this.timerInterval = null;
-        this.currentLevel = 1;
-        this.maxLevels = 3;
+// ------------------- Peg Solitaire - POO + Drag & Drop -------------------
 
-        // Banco de imágenes disponibles
-        this.imageBank = [
-            "https://i.postimg.cc/YSVB7sLm/1.jpg",
-            "https://i.postimg.cc/0N31vBKK/2.jpg",
-            "https://i.postimg.cc/cJjGWbtn/3.jpg",
-            "https://i.postimg.cc/ZqgzmMvC/4.jpg",
-            "https://i.postimg.cc/MGTCpPXH/img5.jpg",
-            "https://i.postimg.cc/k540g1Dg/img6.jpg"
-        ];
-
-        this.bindEvents(); // Enlaza eventos del mouse
+class Assets {
+    constructor() {
+        this.images = {
+            ficha: null,
+            ficha2: null
+        };
+        this.urls = {
+            ficha: 'https://i.postimg.cc/G3YB35w3/personaje1.jpg',
+            ficha2: 'https://i.postimg.cc/KvQQQNGw/personaje2.jpg'
+        };
     }
 
-    // Asocia eventos de arrastre y rotación de piezas
-    bindEvents() {
-        this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this));
-        this.canvas.addEventListener("mousemove", this.onMouseMove.bind(this));
-        this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this));
-        this.canvas.addEventListener("contextmenu", e => {
-            e.preventDefault();
-            this.rotatePiece(e, 90); // clic derecho rota la pieza
+    preloadImage(url) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = url;
         });
     }
 
-    // Carga un nivel según el tamaño base y nivel actual
-    loadLevel() {
-        this.isActive = true; 
-        this.stopTimer();
-
-        // Guarda el tamaño base al iniciar
-        if (!this.baseGridSize) this.baseGridSize = this.gridSize;
-
-        // Aumenta dificultad (más piezas por nivel)
-        if (this.baseGridSize === 4) {
-            if (this.currentLevel === 2) this.gridSize = 5;
-        } else if (this.baseGridSize === 5) {
-            if (this.currentLevel === 2) this.gridSize = 6;
-        } else if (this.baseGridSize === 6) {
-            if (this.currentLevel === 2) this.gridSize = 7;
-        }
-
-        // Carga la imagen elegida o una aleatoria
-        if (this.currentLevel === 1 && url) this.loadImage(url);
-        else this.loadImage(this.getRandomImage());
-    }
-
-    // Carga la imagen seleccionada y crea el puzzle
-    async loadImage(url) {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = url;
-        await img.decode();
-        this.image = img;
-        this.createPieces();
-        this.shuffleRotations();
-        this.draw();
-        this.startTimer();
-    }
-
-    // Crea las piezas del puzzle según el tamaño
-    createPieces() {
-        const step = this.size / this.gridSize;
-        this.pieces = [];
-        for (let y = 0; y < this.gridSize; y++) {
-            for (let x = 0; x < this.gridSize; x++) {
-                this.pieces.push({
-                    sx: x * step,
-                    sy: y * step,
-                    x: x * step,
-                    y: y * step,
-                    correctX: x * step,
-                    correctY: y * step,
-                    size: step,
-                    rotation: 0
-                });
-            }
-        }
-    }
-
-    // Mezcla posiciones y rotaciones iniciales
-    shuffleRotations() {
-        for (let i = this.pieces.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [this.pieces[i].x, this.pieces[j].x] = [this.pieces[j].x, this.pieces[i].x];
-            [this.pieces[i].y, this.pieces[j].y] = [this.pieces[j].y, this.pieces[i].y];
-        }
-        this.pieces.forEach(p => {
-            const rotations = [0, 90, 180, 270];
-            p.rotation = rotations[Math.floor(Math.random() * 4)];
-        });
-    }
-
-    // Dibuja el puzzle con filtros según el nivel
-    draw(showColor = false) {
-        this.ctx.clearRect(0, 0, this.size, this.size);
-        if (!showColor) {
-            if (this.currentLevel === 1) this.ctx.filter = "grayscale(100%)";
-            else if (this.currentLevel === 2) this.ctx.filter = "grayscale(100%) brightness(1.3)";
-            else this.ctx.filter = "grayscale(60%) brightness(1.2) contrast(1.1) invert(0.4)";
-        } else this.ctx.filter = "none";
-
-        for (const p of this.pieces) {
-            this.ctx.save();
-            this.ctx.translate(p.x + p.size / 2, p.y + p.size / 2);
-            this.ctx.rotate((p.rotation * Math.PI) / 180);
-            this.ctx.drawImage(this.image, p.sx, p.sy, p.size, p.size, -p.size / 2, -p.size / 2, p.size, p.size);
-            this.ctx.restore();
-            this.ctx.strokeRect(p.x, p.y, p.size, p.size);
-        }
-        this.ctx.filter = "none";
-    }
-
-    // Inicia arrastre
-    onMouseDown(e) {
-        if (!this.isActive) return;
-        const { offsetX, offsetY } = e;
-        for (const p of [...this.pieces].reverse()) {
-            if (offsetX > p.x && offsetX < p.x + p.size && offsetY > p.y && offsetY < p.y + p.size) {
-                this.draggedPiece = p;
-                this.offset.x = offsetX - p.x;
-                this.offset.y = offsetY - p.y;
-                break;
-            }
-        }
-    }
-
-    // Mueve la pieza
-    onMouseMove(e) {
-        if (!this.isActive || !this.draggedPiece) return;
-        const { offsetX, offsetY } = e;
-        this.draggedPiece.x = offsetX - this.offset.x;
-        this.draggedPiece.y = offsetY - this.offset.y;
-        this.draw();
-    }
-
-    // Suelta y verifica posición
-    onMouseUp() {
-        if (!this.isActive || !this.draggedPiece) return;
-        const nearest = this.pieces.reduce((a, b) => {
-            const da = Math.hypot(a.x - this.draggedPiece.x, a.y - this.draggedPiece.y);
-            const db = Math.hypot(b.x - this.draggedPiece.x, b.y - this.draggedPiece.y);
-            return da < db ? a : b;
-        });
-        [this.draggedPiece.x, nearest.x] = [nearest.x, this.draggedPiece.x];
-        [this.draggedPiece.y, nearest.y] = [nearest.y, this.draggedPiece.y];
-        this.draggedPiece = null;
-        this.draw();
-        this.checkWin();
-    }
-
-    // Rota pieza con clic derecho
-    rotatePiece(e, angle) {
-        if (!this.isActive) return;
-        const { offsetX, offsetY } = e;
-        for (const p of this.pieces) {
-            if (offsetX > p.x && offsetX < p.x + p.size && offsetY > p.y && offsetY < p.y + p.size) {
-                p.rotation = (p.rotation + angle + 360) % 360;
-                break;
-            }
-        }
-        this.draw();
-        this.checkWin();
-    }
-
-    // Comprueba si el puzzle está completo
-    checkWin() {
-        const complete = this.pieces.every(p => p.rotation === 0) &&
-            this.pieces.every(p => Math.abs(p.x - p.correctX) < 8 && Math.abs(p.y - p.correctY) < 8);
-
-        if (complete) {
-            this.isActive = false;
-            this.stopTimer();
-            const elapsed = ((Date.now() - this.startTime) / 1000).toFixed(1);
-
-            // Muestra imagen a color y luego cartel de victoria
-            this.draw(true);
-            setTimeout(() => {
-                const ganador = document.getElementById('ganador');
-                const miDiv = document.getElementById('miDiv');
-                miDiv.innerHTML = `<p>¡Nivel ${this.currentLevel}/3 completado! Tiempo: ${elapsed}s</p>`;
-                ganador.style.display = 'flex';
-                pantallaJuego.style.display = 'none';
-
-                // Botón volver al menú
-                btnVolverAtras.onclick = () => {
-                    ganador.style.display = 'none';
-                    pantallaJuego.style.display = 'none';
-                    pantallaSolo.style.display = 'flex';
-                };
-
-                // Avanza al siguiente nivel o vuelve al menú
-                setTimeout(() => {
-                    ganador.style.display = 'none';
-                    pantallaJuego.style.display = 'flex';
-                    if (this.currentLevel < this.maxLevels) {
-                        this.currentLevel++;
-                        this.ctx.clearRect(0, 0, this.size, this.size);
-                        this.loadLevel();
-                    } else {
-                        pantallaJuego.style.display = 'none';
-                        pantallaSolo.style.display = 'flex';
-                        this.ctx.clearRect(0, 0, this.size, this.size);
-                    }
-                }, 2500);
-            }, 2000);
-        }
-    }
-
-    // Inicia temporizador
-    startTimer() {
-        this.startTime = Date.now();
-        const timerEl = document.getElementById("timer");
-        this.timerInterval = setInterval(() => {
-            const elapsed = ((Date.now() - this.startTime) / 1000).toFixed(1);
-            timerEl.textContent = `⏱️ Tiempo: ${elapsed}s`;
-        }, 100);
-    }
-
-    // Detiene temporizador
-    stopTimer() {
-        clearInterval(this.timerInterval);
-    }
-
-    // Devuelve imagen aleatoria del banco
-    getRandomImage() {
-        return this.imageBank[Math.floor(Math.random() * this.imageBank.length)];
+    async preloadAll() {
+        const [ficha, ficha2] = await Promise.all([
+            this.preloadImage(this.urls.ficha).catch(() => null),
+            this.preloadImage(this.urls.ficha2).catch(() => null)
+        ]);
+        this.images.ficha = ficha;
+        this.images.ficha2 = ficha2;
     }
 }
 
-// ------------------- Inicialización del juego -------------------
-const canvas = document.getElementById("canvas");
-const messageEl = document.getElementById("message");
-const form = document.getElementById("panel");
-const game = new PuzzleGame(canvas, messageEl);
+/* =========================
+   Temporizador regresivo
+   ========================= */
+class GameTimer {
+    constructor(displayEl, initialSeconds = 120, onExpire = () => {}) {
+        this.displayEl = displayEl;
+        this.initialSeconds = initialSeconds;
+        this.seconds = initialSeconds;
+        this.interval = null;
+        this.onExpire = onExpire;
+    }
 
-// Formulario para ingresar URL y tamaño manual
-form.addEventListener("submit", e => {
-    e.preventDefault();
-    const urlForm = document.getElementById("imgUrl").value.trim();
-    const grid = parseInt(new FormData(form).get("size"));
-    game.gridSize = grid;
-    game.currentLevel = 1;
-    game.loadLevel();
-});
+    start() {
+        this.stop();
+        this.seconds = this.initialSeconds;
+        this._render();
+        this.interval = setInterval(() => {
+            this.seconds--;
+            this._render();
+            if (this.seconds <= 0) {
+                this.stop();
+                this.onExpire();
+            }
+        }, 1000);
+    }
+
+    stop() {
+        if (this.interval) clearInterval(this.interval);
+        this.interval = null;
+    }
+
+    _render() {
+        if (this.displayEl) this.displayEl.textContent = `⏱️ Tiempo: ${this.seconds}s`;
+    }
+
+    getRemaining() {
+        return this.seconds;
+    }
+}
+
+/* =========================
+   Tablero y lógica de juego
+   ========================= */
+class PegBoard {
+    constructor(canvas, assets, cellSize = 50) {
+        this.canvas = canvas;
+        this.ctx = canvas ? canvas.getContext('2d') : null;
+        this.assets = assets;
+        this.cellSize = cellSize;
+        this.board = [];
+        this.selected = null;
+        this.dragging = null;
+        this.dragOffset = { x: 0, y: 0 };
+        this.hints = [];
+        this.hintAnimation = 0;
+        this.animRunning = false;
+
+        this.offsetX = 0;
+        this.offsetY = 0;
+    }
+
+    initBoard() {
+        this.board = [];
+        for (let y = 0; y < 7; y++) {
+            this.board[y] = [];
+            for (let x = 0; x < 7; x++) {
+                if ((x < 2 && y < 2) || (x > 4 && y < 2) || (x < 2 && y > 4) || (x > 4 && y > 4))
+                    this.board[y][x] = null;
+                else this.board[y][x] = 1;
+            }
+        }
+        this.board[3][3] = 0;
+        this.selected = null;
+        this.hints = [];
+    }
+
+    resizeCanvasTo(w = 400, h = 400) {
+        const ratio = window.devicePixelRatio || 1;
+        this.canvas.style.width = `${w}px`;
+        this.canvas.style.height = `${h}px`;
+        this.canvas.width = Math.floor(w * ratio);
+        this.canvas.height = Math.floor(h * ratio);
+        this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        this.offsetX = (this.canvas.clientWidth - 7 * this.cellSize) / 2;
+        this.offsetY = (this.canvas.clientHeight - 7 * this.cellSize) / 2;
+    }
+
+    getCellFromCoords(clientX, clientY) {
+        const rect = this.canvas.getBoundingClientRect();
+        const mx = clientX - rect.left;
+        const my = clientY - rect.top;
+        const x = Math.floor((mx - this.offsetX) / this.cellSize);
+        const y = Math.floor((my - this.offsetY) / this.cellSize);
+        if (x >= 0 && x < 7 && y >= 0 && y < 7 && this.board[y][x] !== null) return { x, y };
+        return null;
+    }
+
+    isValidMove(from, to) {
+        if (!from || !to) return false;
+        if (this.board[to.y][to.x] !== 0) return false;
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        if (Math.abs(dx) === 2 && dy === 0) return this.board[from.y][from.x + dx / 2] === 1;
+        if (Math.abs(dy) === 2 && dx === 0) return this.board[from.y + dy / 2][from.x] === 1;
+        return false;
+    }
+
+    makeMove(from, to) {
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        this.board[from.y][from.x] = 0;
+        this.board[to.y][to.x] = 1;
+        this.board[from.y + dy / 2][from.x + dx / 2] = 0;
+    }
+
+    checkWin() {
+        let count = 0;
+        for (let y = 0; y < 7; y++)
+            for (let x = 0; x < 7; x++)
+                if (this.board[y][x] === 1) count++;
+        return count === 1 && this.board[3][3] === 1;
+    }
+
+    showHints(from) {
+        this.hints = [];
+        if (!from) return;
+        const dirs = [
+            { dx: 2, dy: 0 },
+            { dx: -2, dy: 0 },
+            { dx: 0, dy: 2 },
+            { dx: 0, dy: -2 },
+        ];
+        dirs.forEach(dir => {
+            const to = { x: from.x + dir.dx, y: from.y + dir.dy };
+            if (to.x >= 0 && to.x < 7 && to.y >= 0 && to.y < 7 && this.isValidMove(from, to))
+                this.hints.push(to);
+        });
+    }
+
+    _drawHoles() {
+    for (let y = 0; y < 7; y++) {
+        for (let x = 0; x < 7; x++) {
+            if (this.board[y][x] !== null) { // todas las celdas válidas
+                const px = this.offsetX + x * this.cellSize + this.cellSize / 2;
+                const py = this.offsetY + y * this.cellSize + this.cellSize / 2;
+                const radius = (this.cellSize - 10) / 2;
+
+                this.ctx.beginPath();
+                this.ctx.fillStyle = "#0F3A50"; // color del agujero
+                this.ctx.arc(px, py, radius, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                this.ctx.strokeStyle = "#15394eff"; // borde del agujero
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+            }
+        }
+    }
+    }
+
+    draw() {
+        this.ctx.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
+        this.offsetX = (this.canvas.clientWidth - 7 * this.cellSize) / 2;
+        this.offsetY = (this.canvas.clientHeight - 7 * this.cellSize) / 2;
+
+        this.ctx.fillStyle = "#1E5474";
+        this.ctx.fillRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
+
+        // celdas
+        for (let y = 0; y < 7; y++) {
+            for (let x = 0; x < 7; x++) {
+                if (this.board[y][x] !== null) {
+                    this.ctx.strokeStyle = "#1E5474";
+                    this.ctx.strokeRect(
+                        this.offsetX + x * this.cellSize,
+                        this.offsetY + y * this.cellSize,
+                        this.cellSize,
+                        this.cellSize
+                    );
+                }
+            }
+        }
+
+        // dibujar "agujeros" en celdas vacías
+        this._drawHoles();
+
+        // fichas
+        for (let y = 0; y < 7; y++) {
+            for (let x = 0; x < 7; x++) {
+                if (this.board[y][x] === 1) {
+                    if (this.dragging && this.dragging.from.x === x && this.dragging.from.y === y)
+                        continue; 
+                    this._drawPiece(x, y);
+                }
+            }
+        }
+
+        // ficha arrastrada
+        if (this.dragging) {
+            const img = this.assets.images.ficha;
+            const px = this.dragging.x - this.dragOffset.x;
+            const py = this.dragging.y - this.dragOffset.y;
+            const size = this.cellSize - 10;
+            const radius = 50;
+
+            if (img) {
+                this.ctx.save();
+                this.ctx.beginPath();
+                this.ctx.roundRect(px + 5, py + 5, size, size, radius);
+                this.ctx.clip();
+                this.ctx.drawImage(img, px + 5, py + 5, size, size);
+                this.ctx.restore();
+            } else {
+                this.ctx.beginPath();
+                this.ctx.fillStyle = "#DF9430";
+                this.ctx.arc(px + this.cellSize / 2, py + this.cellSize / 2, size / 2, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+        }
+
+        // hints
+        this._drawHints();
+    }
+
+    _drawPiece(x, y) {
+    const px = this.offsetX + x * this.cellSize;
+    const py = this.offsetY + y * this.cellSize;
+    const img = this.assets.images.ficha;
+    const size = this.cellSize - 10;
+    const radius = 50;
+
+    if (img) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.roundRect(px + 5, py + 5, size, size, radius);
+        this.ctx.clip();
+        this.ctx.drawImage(img, px + 5, py + 5, size, size);
+        this.ctx.restore();
+    } else {
+        this.ctx.beginPath();
+        this.ctx.fillStyle = "#DF9430";
+        this.ctx.arc(px + this.cellSize / 2, py + this.cellSize / 2, size / 2, 0, Math.PI * 2);
+        this.ctx.fill();
+    }
+    }
+
+
+    _drawHints() {
+        this.hintAnimation += 0.12;
+        for (const h of this.hints) {
+            const px = this.offsetX + h.x * this.cellSize + this.cellSize / 2;
+            const py = this.offsetY + h.y * this.cellSize + this.cellSize / 2 + 8 * Math.sin(this.hintAnimation);
+            this.ctx.beginPath();
+            this.ctx.fillStyle = "rgba(255,255,0,0.8)";
+            this.ctx.arc(px, py - 8, 8 + 2 * Math.sin(this.hintAnimation), 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+    }
+
+    startAnimationLoop() {
+        if (this.animRunning) return;
+        this.animRunning = true;
+        const loop = () => {
+            if (!this.animRunning) return;
+            this.draw();
+            requestAnimationFrame(loop);
+        };
+        requestAnimationFrame(loop);
+    }
+
+    stopAnimationLoop() {
+        this.animRunning = false;
+    }
+
+    onMouseDown(clientX, clientY) {
+    const cell = this.getCellFromCoords(clientX, clientY);
+    if (!cell) return;
+
+    if (this.board[cell.y][cell.x] === 1) {
+        this.dragging = {
+            from: { x: cell.x, y: cell.y },
+            x: clientX - this.canvas.getBoundingClientRect().left,
+            y: clientY - this.canvas.getBoundingClientRect().top
+        };
+        this.dragOffset.x = this.cellSize / 2;
+        this.dragOffset.y = this.cellSize / 2;
+
+        // <-- ACA agregamos esto
+        this.showHints(cell);
+    }
+    }
+
+
+    onMouseMove(clientX, clientY) {
+        if (!this.dragging) return;
+        const rect = this.canvas.getBoundingClientRect();
+        this.dragging.x = clientX - rect.left;
+        this.dragging.y = clientY - rect.top;
+    }
+
+    onMouseUp(clientX, clientY, onMoveMade = () => {}) {
+    if (!this.dragging) return;
+    const from = this.dragging.from;
+    const cell = this.getCellFromCoords(clientX, clientY);
+    if (cell && this.isValidMove(from, cell)) {
+        this.makeMove(from, cell);
+        onMoveMade();
+    }
+    this.dragging = null;
+    this.hints = []; // <-- limpia los hints
+    }
+
+    hasMovesLeft() {
+    for (let y = 0; y < 7; y++) {
+        for (let x = 0; x < 7; x++) {
+            if (this.board[y][x] === 1) {
+                const from = { x, y };
+                const dirs = [
+                    { dx: 2, dy: 0 },
+                    { dx: -2, dy: 0 },
+                    { dx: 0, dy: 2 },
+                    { dx: 0, dy: -2 }
+                ];
+                for (const dir of dirs) {
+                    const to = { x: x + dir.dx, y: y + dir.dy };
+                    if (to.x >= 0 && to.x < 7 && to.y >= 0 && to.y < 7 && this.isValidMove(from, to)) {
+                        return true; // hay al menos un movimiento
+                    }
+                }
+            }
+        }
+    }
+    return false; // no hay movimientos
+    }
+
+
+}
+
+/* =========================
+   Clase principal
+   ========================= */
+class PegSolitaireGame {
+    constructor() {
+        this.canvas = document.getElementById('canvas');
+        this.timerEl = document.getElementById('timer');
+        this.pantallaJuego = document.getElementById('juego-pantalla');
+        this.pantallaMenu = document.getElementById('pantalla-juego-principal');
+        this.btnPlay = document.getElementById('btn-play');
+        this.btnReiniciar = document.getElementById('reiniciar');
+        this.btnSalir = document.getElementById('salir');
+
+        this.assets = new Assets();
+        this.board = new PegBoard(this.canvas, this.assets, 50);
+        this.timer = new GameTimer(this.timerEl, 120, this.onTimeUp.bind(this));
+
+        this._bindUI();
+        this._bindCanvasEvents();
+    }
+
+    _bindUI() {
+        this.btnReiniciar?.addEventListener('click', () => {
+            this.startGame();
+        });
+        this.btnSalir?.addEventListener('click', () => {
+            this.pantallaJuego.style.display = 'none';
+            this.pantallaMenu.style.display = 'flex';
+            this.stopGame();
+        });
+    }
+
+    _bindCanvasEvents() {
+        let isDown = false;
+
+        this.canvas.addEventListener('mousedown', (e) => {
+            isDown = true;
+            this.board.onMouseDown(e.clientX, e.clientY);
+        });
+        this.canvas.addEventListener('mousemove', (e) => {
+            if (isDown) this.board.onMouseMove(e.clientX, e.clientY);
+        });
+        this.canvas.addEventListener('mouseup', (e) => {
+            isDown = false;
+            this.board.onMouseUp(e.clientX, e.clientY, () => {
+                if (this.board.checkWin()) {
+                    this.onWin();
+                } else if (!this.board.hasMovesLeft()) {
+                    this.onLose();
+                }
+            });
+        });
+
+        // soporte táctil
+        this.canvas.addEventListener('touchstart', (e) => {
+            const t = e.touches[0];
+            this.board.onMouseDown(t.clientX, t.clientY);
+        });
+        this.canvas.addEventListener('touchmove', (e) => {
+            const t = e.touches[0];
+            this.board.onMouseMove(t.clientX, t.clientY);
+        });
+        this.canvas.addEventListener('touchend', (e) => {
+            const t = e.changedTouches[0];
+            this.board.onMouseUp(t.clientX, t.clientY, () => {
+                if (this.board.checkWin()) {
+                    this.onWin();
+                } else if (!this.board.hasMovesLeft()) {
+                    this.onLose();
+                }
+            });
+        });
+    
+    }
+
+    async startGame() {
+        await this.assets.preloadAll();
+        this.board.resizeCanvasTo(400, 400);
+        this.board.initBoard();
+        this.timer.start();
+        this.board.startAnimationLoop();
+    }
+
+    stopGame() {
+        this.timer.stop();
+        this.board.stopAnimationLoop();
+    }
+
+    onTimeUp() {
+        alert("⏰ ¡Se acabó el tiempo!");
+        this.stopGame();
+        this.pantallaJuego.style.display = 'none';
+        this.pantallaMenu.style.display = 'flex';
+    }
+
+    onWin() {
+        this.timer.stop();
+        // alert(`🎉 ¡Ganaste con ${this.timer.getRemaining()}s restantes!`);
+        // this.stopGame();
+        const ganador = document.getElementById('ganador'); // Obtiene el elemento que muestra la pantalla de ganador
+        const miDiv = document.getElementById('miDiv');
+        miDiv.innerHTML = `<p>💀 No quedan más movimientos. ¡Perdiste!</p>`;
+        this.pantallaJuego.style.display = 'none';
+        ganador.style.display = 'flex';
+    }
+
+    onLose() {
+        this.timer.stop();
+        // alert("💀 No quedan más movimientos. ¡Perdiste!");
+        const perdedor = document.getElementById('perdedor'); // Obtiene el elemento que muestra la pantalla de perdedor
+        const miDiv = document.getElementById('miDiv');
+        this.stopGame();
+        miDiv.innerHTML = `<p>💀 No quedan más movimientos. ¡Perdiste!</p>`;
+        this.pantallaJuego.style.display = 'none';
+        perdedor.style.display = 'flex';
+    }
+
+}

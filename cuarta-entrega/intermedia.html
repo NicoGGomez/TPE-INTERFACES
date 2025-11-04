@@ -6,7 +6,8 @@
     <title>Galaxy Games - Peg solitarie</title>
 
     <link rel="icon" href="../Segunda-entrega/logos/icono.png" type="image/png">
-    <link rel="stylesheet" href="../Segunda-entrega/styles/main.css">
+    <!-- <link rel="stylesheet" href="../Segunda-entrega/styles/main.css"> -->
+    <link rel="stylesheet" href="../cuarta-entrega/styles/main.css">
 
 </head>
 <body>
@@ -82,7 +83,7 @@
                     <div class="pantalla-principal">
 
                                 <div class="titulo">
-                                    <img src="../Segunda-entrega/imgs/juego-reproduciendo.png" alt="">
+                                    <img src="../cuarta-entrega/imgs/juego-reproduciendo.png" alt="">
                                 </div>
 
                             <div class="opciones">
@@ -97,31 +98,28 @@
         </div>
 
         <!-- FORMULARIO PERSONAJES Y MODO -->
-                                
-        <div id="solitario" class="juego-ejecucion">
-
-            <form id="panel">
-                <label for="">Seleccione el rompecabezas</label>
-                <div class="contenedor-imgs">
-                <img id="imagen1" src="imgs/img1/img1.png" alt="">
-                <img id="imagen2" src="imgs/img2/img2.png" alt="">
-                <img id="imagen3" src="imgs/img3/img3.png" alt="">
-                <img id="imagen4" src="imgs/img4/img4.png" alt="">
-                <img id="imagen5" src="imgs/img5/img5.jpg" alt="">
-                <img id="imagen6" src="imgs/img6/img6.jpg" alt="">
-                </div>
-                <button id="btn-img-volver">volver al menu principal</button>
-            </form>
-
-        </div>
 
         <div id="solitario-piezas" class="juego-ejecucion-piezas">
 
-            <form id="panel-piezas">
-                <label>Dificultad:</label>
-                <label><input type="radio" name="size" value="2" checked> 2 x 2</label>
-                <label><input type="radio" name="size" value="3"> 3 x 3</label>
-                <label><input type="radio" name="size" value="4"> 4 x 4</label>
+            <form id="panel">
+                <label>Selecciona el personaje</label>
+
+                <div class="contenedor-personajes">
+                    <div class="contenedor-pj">
+                        <input type="radio" id="opcion1" name="pieza" value="ficha">
+                        <label class="radio-label" for="opcion1">
+                            <img class="img-ficha" src="imgs/personaje1.jpg"  alt="">
+                        </label>
+                    </div>
+                
+                    <div class="contenedor-pj">
+                        <input type="radio" id="opcion2" name="pieza" value="ficha2">
+                        <label class="radio-label" for="opcion2">
+                            <img class="img-ficha" src="imgs/personaje2.jpg"  alt="">
+                        </label> 
+                    </div>
+                </div>
+
                 <button class="btn-primario" id="btn-listo-para-jugar" type="submit">Iniciar</button>
             </form>
 
@@ -133,8 +131,8 @@
                 <p id="timer" style="font-weight:bold; color:white; margin-bottom:10px;">⏱️ Tiempo: 0s</p>
                 <canvas id="canvas" width="400" height="400"></canvas>
                 <div class="contenedor-opciones">
+                    <button id="reiniciar">Reiniciar</button>
                     <button id="salir">Salir</button>
-                    <button id="mezclar">Mezclar</button>
                 </div>
             </div>
 
@@ -151,26 +149,25 @@
         <div id="pantalla-instrucciones" class="instrucciones">
                 <div class="container">
                     <div class="contenedor-texto">
-                        <p>Instrucciones</p>
-                        <li>Elegí una imagen y el tamaño del rompecabezas (4x4, 5x5 o 6x6).</li>
-                        <li>Las piezas aparecerán desordenadas y rotadas en la pantalla.</li>
+                        <p>Instrucciones</p> 
+                        <li>Elegí el diseño del tablero (clásico, cruz o diamante) antes de comenzar la partida.</li>
+                        <li>El tablero se llenará con fichas, dejando solo un espacio vacío en el centro.</li>
                         <li>
-                        <strong>Rotación de piezas:</strong> hacé clic derecho sobre una pieza para girarla 90° hasta que quede en la posición correcta.
+                        <strong>Cómo jugar:</strong> saltá una ficha sobre otra en línea recta (horizontal o vertical) hacia un espacio vacío.
+                        La ficha saltada se elimina del tablero.
                         </li>
                         <li>
-                        <strong>Objetivo:</strong> armá la imagen original colocando cada pieza en su lugar correcto y con la orientación adecuada.
+                        <strong>Objetivo:</strong> eliminá todas las fichas posibles hasta que solo quede una en el centro del tablero.
                         </li>
                         <li>
-                        <strong>Filtros y dificultad:</strong> cada nivel aplica filtros visuales (como escala de grises, brillo o contraste) que aumentan la dificultad. 
-                        En los niveles más altos, la imagen se vuelve más difícil de distinguir.
+                        <strong>Dificultad:</strong> podés elegir tableros con diferentes distribuciones y tamaños, lo que modifica la complejidad del juego.
                         </li>
                         <li>
-                        <strong>Temporizador:</strong> el tiempo comienza al iniciar el nivel y se detiene al completarlo. 
-                        Cuanto más rápido armes el puzzle, mejor será tu resultado.
+                        <strong>Temporizador:</strong> el tiempo comienza al iniciar la partida y se detiene al completarla.
+                        Cuanto menos tiempo tardes en dejar una sola ficha, mejor será tu resultado.
                         </li>
                         <li>
-                        <strong>Funciones extra:</strong> podés usar el botón <em>“Mezclar”</em> para reiniciar el nivel o probar diferentes tamaños de grilla para aumentar la dificultad. 
-                        En futuros modos, se incluirán ayudas visuales (“ayudita”) para facilitar el armado.
+                        <strong>Funciones extra:</strong> podés usar el botón <em>“Reiniciar”</em> para volver a empezar o el modo <em>“Ayuda”</em> para mostrar posibles movimientos válidos.
                         </li>
                     </div>
                     
@@ -181,6 +178,11 @@
         </div>
 
         <div id="ganador" class="contenedor-ganador">
+            <div id="miDiv"></div>
+            <button id="btn-volver">volver al menu principal</button>
+        </div>
+
+        <div id="perdedor" class="contenedor-perdedor">
             <div id="miDiv"></div>
             <button id="btn-volver">volver al menu principal</button>
         </div>
@@ -379,8 +381,7 @@
         </div>
     </footer>
 
-    <script src="../Segunda-entrega/scripts/juego/juego.js"></script>
     <script src="../Segunda-entrega/scripts/menuHamburguesa.js"></script>
-    <script src="../Segunda-entrega/scripts/juego.js"></script>
+    <script src="../cuarta-entrega/scripts/juego.js"></script>
 </body>
 </html>
