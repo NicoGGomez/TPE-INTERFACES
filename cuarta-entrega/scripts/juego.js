@@ -103,6 +103,7 @@ class Assets {
     }
 }
 
+
 /* =========================
    Temporizador regresivo
    ========================= */
@@ -142,6 +143,7 @@ class GameTimer {
         return this.seconds;
     }
 }
+
 
 /* =========================
    Tablero y lógica de juego
@@ -454,6 +456,7 @@ class PegSolitaireGame {
         this.btnReiniciar = document.getElementById('reiniciar');
         this.btnSalir = document.getElementById('salir');
 
+        this.img = ''
         this.assets = new Assets();
         this.board = new PegBoard(this.canvas, this.assets, 50);
         this.timer = new GameTimer(this.timerEl, 120, this.onTimeUp.bind(this));
@@ -530,10 +533,17 @@ class PegSolitaireGame {
     }
 
     onTimeUp() {
-        alert("⏰ ¡Se acabó el tiempo!");
         this.stopGame();
+        const perdedor = document.getElementById('perdedor'); // Obtiene el elemento que muestra la pantalla de perdedor
+        const miDiv = document.getElementById('miDivPer');
+        this.stopGame();
+        miDiv.innerHTML = `<p>No quedan más tiempo. ¡Perdiste!</p>`;
         this.pantallaJuego.style.display = 'none';
-        this.pantallaMenu.style.display = 'flex';
+        perdedor.style.display = 'flex';
+        document.getElementById('btn-volver-per').addEventListener('click', () => {
+            perdedor.style.display = 'none';
+            this.pantallaMenu.style.display = 'flex'; 
+        })
     }
 
     onWin() {
@@ -541,21 +551,29 @@ class PegSolitaireGame {
         // alert(`🎉 ¡Ganaste con ${this.timer.getRemaining()}s restantes!`);
         // this.stopGame();
         const ganador = document.getElementById('ganador'); // Obtiene el elemento que muestra la pantalla de ganador
-        const miDiv = document.getElementById('miDiv');
-        miDiv.innerHTML = `<p>💀 No quedan más movimientos. ¡Perdiste!</p>`;
+        const miDiv = document.getElementById('miDivGa');
+        miDiv.innerHTML = `<¡Ganaste con ${this.timer.getRemaining()}s restantes!`;
         this.pantallaJuego.style.display = 'none';
         ganador.style.display = 'flex';
+        document.getElementById('btn-volver-ga').addEventListener('click', () => {
+            ganador.style.display = 'none';
+            this.pantallaMenu.style.display = 'flex'; 
+        })
     }
 
     onLose() {
         this.timer.stop();
         // alert("💀 No quedan más movimientos. ¡Perdiste!");
         const perdedor = document.getElementById('perdedor'); // Obtiene el elemento que muestra la pantalla de perdedor
-        const miDiv = document.getElementById('miDiv');
+        const miDiv = document.getElementById('miDivPer');
         this.stopGame();
-        miDiv.innerHTML = `<p>💀 No quedan más movimientos. ¡Perdiste!</p>`;
+        miDiv.innerHTML = `<p>No quedan más movimientos. ¡Perdiste!</p>`;
         this.pantallaJuego.style.display = 'none';
         perdedor.style.display = 'flex';
+        document.getElementById('btn-volver-per').addEventListener('click', () => {
+            perdedor.style.display = 'none';
+            this.pantallaMenu.style.display = 'flex'; 
+        })
     }
 
 }
