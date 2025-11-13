@@ -65,6 +65,8 @@ panel.addEventListener('submit', async (e) => {
         peg.assets.urls.ficha = "https://i.postimg.cc/G3YB35w3/personaje1.jpg";
     else if(selected.value === "ficha2") 
         peg.assets.urls.ficha = "https://i.postimg.cc/KvQQQNGw/personaje2.jpg";
+    else if(selected.value === "ficha3")
+        peg.assets.urls.ficha = "https://i.postimg.cc/63GxFJMK/Untitled-Project-6.jpg";
 
     await peg.startGame(); // startGame ya carga la imagen y arranca el tablero
 });
@@ -75,11 +77,13 @@ class Assets {
     constructor() {
         this.images = {
             ficha: null,
-            ficha2: null
+            ficha2: null,
+            ficha3: null
         };
         this.urls = {
             ficha: 'https://i.postimg.cc/G3YB35w3/personaje1.jpg',
-            ficha2: 'https://i.postimg.cc/KvQQQNGw/personaje2.jpg'
+            ficha2: 'https://i.postimg.cc/KvQQQNGw/personaje2.jpg',
+            ficha3: 'https://i.postimg.cc/63GxFJMK/Untitled-Project-6.jpg'
         };
     }
 
@@ -202,22 +206,73 @@ class PegBoard {
         return null;
     }
 
+    // VERIFICACION DEL MOVIMIENTO ANTES DE LA REVISION
+
+    // isValidMove(from, to) {
+    //     if (!from || !to) return false;
+    //     if (this.board[to.y][to.x] !== 0) return false;
+    //     const dx = to.x - from.x;
+    //     const dy = to.y - from.y;
+    //     if (Math.abs(dx) === 2 && dy === 0) return this.board[from.y][from.x + dx / 2] === 1;
+    //     if (Math.abs(dy) === 2 && dx === 0) return this.board[from.y + dy / 2][from.x] === 1;
+    //     return false;
+    // }
+
     isValidMove(from, to) {
         if (!from || !to) return false;
         if (this.board[to.y][to.x] !== 0) return false;
+
         const dx = to.x - from.x;
         const dy = to.y - from.y;
-        if (Math.abs(dx) === 2 && dy === 0) return this.board[from.y][from.x + dx / 2] === 1;
-        if (Math.abs(dy) === 2 && dx === 0) return this.board[from.y + dy / 2][from.x] === 1;
+
+        // salto de una ficha
+        if (Math.abs(dx) === 2 && dy === 0)
+            return this.board[from.y][from.x + dx / 2] === 1;
+        if (Math.abs(dy) === 2 && dx === 0)
+            return this.board[from.y + dy / 2][from.x] === 1;
+
+        // salto de dos fichas seguidas (3 espacios)
+        if (Math.abs(dx) === 3 && dy === 0)
+            return this.board[from.y][from.x + dx / 3] === 1 &&
+                this.board[from.y][from.x + (2 * dx) / 3] === 1;
+        if (Math.abs(dy) === 3 && dx === 0)
+            return this.board[from.y + dy / 3][from.x] === 1 &&
+                this.board[from.y + (2 * dy) / 3][from.x] === 1;
+
         return false;
     }
+
+    // MOVIMIENTO ANTES DE LA REVISION
+
+    // makeMove(from, to) {
+    //     const dx = to.x - from.x;
+    //     const dy = to.y - from.y;
+    //     this.board[from.y][from.x] = 0;
+    //     this.board[to.y][to.x] = 1;
+    //     this.board[from.y + dy / 2][from.x + dx / 2] = 0;
+    // }
 
     makeMove(from, to) {
         const dx = to.x - from.x;
         const dy = to.y - from.y;
+
         this.board[from.y][from.x] = 0;
         this.board[to.y][to.x] = 1;
-        this.board[from.y + dy / 2][from.x + dx / 2] = 0;
+
+        // salto de una ficha
+        if (Math.abs(dx) === 2 && dy === 0)
+            this.board[from.y][from.x + dx / 2] = 0;
+        else if (Math.abs(dy) === 2 && dx === 0)
+            this.board[from.y + dy / 2][from.x] = 0;
+
+        // salto de dos fichas seguidas
+        else if (Math.abs(dx) === 3 && dy === 0) {
+            this.board[from.y][from.x + dx / 3] = 0;
+            this.board[from.y][from.x + (2 * dx) / 3] = 0;
+        } else if (Math.abs(dy) === 3 && dx === 0) {
+            this.board[from.y + dy / 3][from.x] = 0;
+            this.board[from.y + (2 * dy) / 3][from.x] = 0;
+        }
     }
 
     checkWin() {
@@ -228,21 +283,51 @@ class PegBoard {
         return count === 1 && this.board[3][3] === 1;
     }
 
+    // SHOWHINTS ANTES DE LA REVISION
+
+    // showHints(from) {
+    //     this.hints = [];
+    //     if (!from) return;
+    //     const dirs = [
+    //         { dx: 2, dy: 0 },
+    //         { dx: -2, dy: 0 },
+    //         { dx: 0, dy: 2 },
+    //         { dx: 0, dy: -2 },
+    //     ];
+    //     dirs.forEach(dir => {
+    //         const to = { x: from.x + dir.dx, y: from.y + dir.dy };
+    //         if (to.x >= 0 && to.x < 7 && to.y >= 0 && to.y < 7 && this.isValidMove(from, to))
+    //             this.hints.push(to);
+    //     });
+    // }
+
     showHints(from) {
         this.hints = [];
         if (!from) return;
+
         const dirs = [
             { dx: 2, dy: 0 },
             { dx: -2, dy: 0 },
             { dx: 0, dy: 2 },
             { dx: 0, dy: -2 },
+            { dx: 3, dy: 0 },  // salto doble horizontal
+            { dx: -3, dy: 0 },
+            { dx: 0, dy: 3 },  // salto doble vertical
+            { dx: 0, dy: -3 }
         ];
+
         dirs.forEach(dir => {
             const to = { x: from.x + dir.dx, y: from.y + dir.dy };
-            if (to.x >= 0 && to.x < 7 && to.y >= 0 && to.y < 7 && this.isValidMove(from, to))
+            if (
+                to.x >= 0 && to.x < 7 &&
+                to.y >= 0 && to.y < 7 &&
+                this.isValidMove(from, to)
+            ) {
                 this.hints.push(to);
+            }
         });
     }
+
 
     _drawHoles() {
     for (let y = 0; y < 7; y++) {
@@ -358,7 +443,7 @@ class PegBoard {
             const px = this.offsetX + h.x * this.cellSize + this.cellSize / 2;
             const py = this.offsetY + h.y * this.cellSize + this.cellSize / 2 + 8 * Math.sin(this.hintAnimation);
             this.ctx.beginPath();
-            this.ctx.fillStyle = "rgba(255,255,0,0.8)";
+            this.ctx.fillStyle = "rgba(72, 255, 31, 0.8)";
             this.ctx.arc(px, py - 8, 8 + 2 * Math.sin(this.hintAnimation), 0, Math.PI * 2);
             this.ctx.fill();
         }
