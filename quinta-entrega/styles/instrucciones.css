@@ -1,0 +1,26 @@
+.contenedor-instrucciones {
+    background-color: var(--color-primario-sombra);
+    width: 1200px;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.contenedor-instrucciones .contenedor-titulo {
+    padding: 10px 10px 0 10px;
+    font-weight: bold;
+}
+
+.contenedor-instrucciones .contenedor-texto {
+    padding: 0 10px 10px 10px;
+}
+
+@media (max-width: 600px) {
+
+.contenedor-instrucciones {
+    width: 100%;
+}
+
+
+}

@@ -1,0 +1,23 @@
+/* estilos globales */
+@import "variables.css";
+@import "nav.css";
+@import "menuHamburguesa.css";
+@import "footer.css";
+
+/* loader */
+@import "loader.css";
+
+/* inicio */
+@import "carruseles.css";
+
+/* intermedia */
+@import "breadcrumb.css";
+@import "juego.css";
+@import "instrucciones.css";
+@import "comentarios.css";
+
+/* login */
+@import "login.css";
+
+/* registro */
+@import "registro.css";

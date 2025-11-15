@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Games - Runner</title>
+
+    <link rel="icon" href="../Segunda-entrega/logos/icono.png" type="image/png">
+    <link rel="stylesheet" href="../quinta-entrega/styles/main.css">
+
+</head>
+<body>
+    
+    <nav>
+        <div class="contenedor-izq">
+            <li><img id="btn-menu-hamburguesa" src="../Segunda-entrega/logos/Menu.png" alt=""></li>
+        </div>
+        <a href="../Segunda-entrega/index.html">
+            <div class="contenedor-titulo">
+            <img src="../Segunda-entrega//logos/icono.png" alt="">
+            <p>GALAXY GAMES</p>
+        </div>
+        </a>
+        <div class="contenedor-der">
+            <li><img class="carrito" src="../Segunda-entrega/logos/carrito.png" alt=""></li>
+            <li><a href="login.html"><img src="../Segunda-entrega/logos/usuario.png" alt=""></a></li>
+        </div>
+    </nav>
+
+    <div id="menu-hamburguesa" class="contenedor-menu-hamburguesa">
+        <ul>
+            <li>
+                <a href="intermedia.html">
+                    <img src="../Segunda-entrega/logos/Star.png" alt=""> <p>favoritos</p>
+                </a>
+            </li>
+            <li>
+                <a href="../Segunda-entrega/index.html">
+                    <img src="../Segunda-entrega/logos/puzzle.png" alt=""> <p>Accion</p>
+                </a>
+            </li>
+            <li>
+                <a href="../Segunda-entrega/index.html">
+                    <img src="../Segunda-entrega/logos/accion.png" alt=""> <p>aventura</p>
+                </a>
+            </li>
+            <li>
+                <a href="../Segunda-entrega/index.html">
+                    <img src="../Segunda-entrega/logos/accion.png" alt=""> <p>Mesa</p>
+                </a>
+            </li>
+            <li>
+                <a href="../Segunda-entrega/login.html">
+                    <img src="../Segunda-entrega/logos/carreras.png" alt=""> <p>Autos</p>
+                </a>
+            </li>
+            <li>
+                <a href="../Segunda-entrega/registro.html">
+                    <img src="../Segunda-entrega/logos/accion.png" alt=""> <p>Multijugador</p>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="contenedor-bd">
+        <div class="contenedor-breadcrumb">
+        <a href="../Segunda-entrega/index.html">Juegos</a><p>→</p><a href="../Segunda-entrega/index.html">Favoritos</a><p>→</p><a href="">Runner</a>
+        </div>
+    </div>
+
+    <div class="contenedor-seccion-juego">
+        
+        <div class="contenedor-juego" id="pantalla-juego">
+            <div class="img">
+            <button id="btn-play" class="btn-jugar"><span class="logo-btn"></span>PLAY</button>
+            </div>
+        </div>
+
+        <div id="pantalla-juego-principal" class="pantalla-activa">
+                <div class="img">
+                                        
+                    <div class="pantalla-principal">
+
+                                <div class="titulo">
+                                    <img src="../quinta-entrega/imgs/juego-reproduciendo.png" alt="">
+                                </div>
+
+                            <div class="opciones">
+                                <button id="solo" class="btn">Jugar Solo</button>
+                                <button id="multijugador" class="btn">Multijugador</button>
+                                <button id="instrucciones" class="btn">instrucciones</button>
+                        </div>
+
+                    </div>
+
+                </div>
+        </div>
+
+        <!-- FORMULARIO PERSONAJES Y MODO -->
+
+        <div id="solitario-piezas" class="juego-ejecucion-piezas">
+
+            <form id="panel">
+                <label>Selecciona el personaje</label>
+
+                <div class="contenedor-personajes">
+                    <div class="contenedor-pj">
+                        <input type="radio" id="opcion1" name="pieza" value="ficha" checked> 
+                        <label class="radio-label" for="opcion1">
+                            <img class="img-ficha" src="imgs/personaje1.jpg"  alt="">
+                        </label>
+                    </div>
+                
+                    <div class="contenedor-pj">
+                        <input type="radio" id="opcion2" name="pieza" value="ficha2">
+                        <label class="radio-label" for="opcion2">
+                            <img class="img-ficha" src="imgs/personaje2.jpg"  alt="">
+                        </label> 
+                    </div>
+
+                    <div class="contenedor-pj">
+                        <input type="radio" id="opcion3" name="pieza" value="ficha3">
+                        <label class="radio-label" for="opcion3">
+                            <img class="img-ficha" src="imgs/personaje3.jpg"  alt="">
+                        </label> 
+                    </div>
+                </div>
+
+                <button class="btn-primario" id="btn-listo-para-jugar" type="submit">Iniciar</button>
+            </form>
+
+        </div>
+
+        <div id="juego-pantalla" class="juegop"> 
+
+            <div class="contenedor-canvas">
+                <p id="timer" style="font-weight:bold; color:white; margin-bottom:10px;">⏱️ Tiempo: 0s</p>
+                <canvas id="canvas" width="400" height="400"></canvas>
+                <div class="contenedor-opciones">
+                    <button id="reiniciar">Reiniciar</button>
+                    <button id="salir">Salir</button>
+                </div>
+            </div>
+
+        </div>   
+                                
+        <div id="pantalla-multijugador" class="multijugador">
+                <div class="container">
+                    <p>Proximamente</p>
+                </div>
+                <button id="volver-multijugador">Volver al menu</button>
+        </div>
+
+
+        <div id="pantalla-instrucciones" class="instrucciones">
+                <div class="container">
+                    <div class="contenedor-texto">
+                        <p>Instrucciones</p> 
+                        <li>Elegí el diseño del tablero (clásico, cruz o diamante) antes de comenzar la partida.</li>
+                        <li>El tablero se llenará con fichas, dejando solo un espacio vacío en el centro.</li>
+                        <li>
+                        <strong>Cómo jugar:</strong> saltá una ficha sobre otra en línea recta (horizontal o vertical) hacia un espacio vacío.
+                        La ficha saltada se elimina del tablero.
+                        </li>
+                        <li>
+                        <strong>Objetivo:</strong> eliminá todas las fichas posibles hasta que solo quede una en el centro del tablero.
+                        </li>
+                        <li>
+                        <strong>Dificultad:</strong> podés elegir tableros con diferentes distribuciones y tamaños, lo que modifica la complejidad del juego.
+                        </li>
+                        <li>
+                        <strong>Temporizador:</strong> el tiempo comienza al iniciar la partida y se detiene al completarla.
+                        Cuanto menos tiempo tardes en dejar una sola ficha, mejor será tu resultado.
+                        </li>
+                        <li>
+                        <strong>Funciones extra:</strong> podés usar el botón <em>“Reiniciar”</em> para volver a empezar o el modo <em>“Ayuda”</em> para mostrar posibles movimientos válidos.
+                        </li>
+                    </div>
+                    
+                </div>
+                <div class="contenedor-boton">
+                        <button id="volver-instrucciones">Volver al menu</button>
+                </div>
+        </div>
+
+        <div id="ganador" class="contenedor-ganador">
+            <div id="miDivGa"></div>
+            <button id="btn-volver-ga">volver al menu principal</button>
+        </div>
+
+        <div id="perdedor" class="contenedor-perdedor">
+            <div id="miDivPer"></div>
+            <button id="btn-volver-per">volver al menu principal</button>
+        </div>
+
+    <div class="contenedor-info-juego">
+            <div class="contenedor-arriba">
+                <div class="contenedor-titulo">
+                    <h3>Runner</h3>
+                </div>
+                <div class="contenedor-redes">
+                    <img src="../Segunda-entrega/logos/Facebook.png" alt="">
+                    <img src="../Segunda-entrega/logos/Instagram.png" alt="">
+                    <img src="../Segunda-entrega/logos/whatsapp.png" alt="">
+                </div>
+            </div>
+            <div class="contenedor-medio">
+                <p>El Peg Solitaire Alienígena es una versión espacial del clásico solitario, donde un tablero intergaláctico con fichas representadas por criaturas y naves alienígenas desafía... leer mas.</p>
+            </div>
+            <div class="contenedor-abajo">
+                <img src="../Segunda-entrega/logos/like.png" alt="">
+                <img src="../Segunda-entrega/logos/dislike.png" alt=""> 
+            </div>
+    </div>
+
+    <div class="contenedor-instrucciones">
+            <div class="contenedor-titulo">
+            <p>instrucciones:</p>
+            </div>
+            <div class="contenedor-texto">
+                <p>Objetivo: mover todas los pegs del tablero saltando sobre ellas, eliminando el peg saltado. El ultimo peg debe quedar en una posición especifica en el centro del tablero.
+            Movimientos: puedes saltar un peg sobre otro adyacente, horizontal o verticalmente. Solo se permiten saltos sobre pegs adyacentes.
+            ganar: el juego termina cuando no hay mas saltos posibles, el ultimo peg debe quedar en la casilla central para ganar.</p>
+            </div>
+    </div>
+    </div>
+
+    <div class="contenedor-comentarios">
+
+        <div class="contenedor-dejar-comentario">
+            <form action="">
+            <div class="contenedor-titulo">
+                <p>Deja un comentario</p>
+            </div>
+                <input type="text">
+                <div class="contenedor-boton">
+                    <button>Comentar</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="comentarios">
+            <div class="contenedor-comentario">
+            <div class="contenedor-img">
+                <img src="../Segunda-entrega/imgs/foto1.png" alt="">
+            </div>
+            <div class="contenedor-com">
+                <div class="contenedor-nombre">
+                    <p>Awus</p>
+                </div>
+                <div class="contenedor-texto">
+                    <p>ta bueno</p>
+                </div>
+                <div class="contenedor-responder">
+                    <p>Responder</p>
+                </div>
+            </div>
+            <div class="contenedor-opinion">
+                <img src="../Segunda-entrega/logos/like.png" alt="">
+                <img src="../Segunda-entrega/logos/dislike.png" alt="">
+            </div>
+        </div>
+
+        <div class="contenedor-comentario">
+            <div class="contenedor-img">
+                <img src="../Segunda-entrega/imgs/foto2.png" alt="">
+            </div>
+            <div class="contenedor-com">
+                <div class="contenedor-nombre">
+                    <p>LauchiitaGamer01</p>
+                </div>
+                <div class="contenedor-texto">
+                    <p>pay to win</p>
+                </div>
+                <div class="contenedor-responder">
+                    <p>Responder</p>
+                </div>
+            </div>
+            <div class="contenedor-opinion">
+                <img src="../Segunda-entrega/logos/like.png" alt="">
+                <img src="../Segunda-entrega/logos/dislike.png" alt="">
+            </div>
+        </div>
+
+        <div class="contenedor-comentario">
+            <div class="contenedor-img">
+                <img src="../Segunda-entrega/imgs/foto5.png" alt="">
+            </div>
+            <div class="contenedor-com">
+                <div class="contenedor-nombre">
+                    <p>Trompija</p>
+                </div>
+                <div class="contenedor-texto">
+                    <p>ayyy que juego de mier**</p>
+                </div>
+                <div class="contenedor-responder">
+                    <p>Responder</p>
+                </div>
+            </div>
+            <div class="contenedor-opinion">
+                <img src="../Segunda-entrega/logos/like.png" alt="">
+                <img src="../Segunda-entrega/logos/dislike.png" alt="">
+            </div>
+        </div>
+
+        <div class="contenedor-comentario">
+            <div class="contenedor-img">
+                <img src="../Segunda-entrega/imgs/foto3.png" alt="">
+            </div>
+            <div class="contenedor-com">
+                <div class="contenedor-nombre">
+                    <p>Juan Alvarado</p>
+                </div>
+                <div class="contenedor-texto">
+                    <p>Dislike no hay tet**</p>
+                </div>
+                <div class="contenedor-responder">
+                    <p>Responder</p>
+                </div>
+            </div>
+            <div class="contenedor-opinion">
+                <img src="../Segunda-entrega/logos/like.png" alt="">
+                <img src="../Segunda-entrega/logos/dislike.png" alt="">
+            </div>
+        </div>
+        </div>
+
+        <div class="contenedor-mas">
+            <p>Mostrar mas...</p>
+        </div>
+        
+    </div>
+
+    <footer>
+        <div class="contenedor-izq">
+            <div class="contenedor-titulo">
+                <p>GALAXY GAMES</p>
+            </div>
+            <div class="contenedor-redes">
+                <img src="../Segunda-entrega/logos/Facebook.png" alt="">
+                <img src="../Segunda-entrega/logos/Instagram.png" alt="">
+                <img src="../Segunda-entrega/logos/whatsapp.png" alt="">
+            </div>
+        </div>
+        <div class="contenedor-der">
+            <div class="contenedor contenedor-juegos">
+                <p>Juegos</p>
+                <div class="contenedor-links">
+                <a href="">Populares</a>
+                <a href="">Nuevos</a>
+                <a href="">Categorias</a>
+                <a href="">En oferta</a></div>
+            </div>
+            <div class="contenedor contenedor-comunidad">
+                <p>Comunidad</p>
+                <div class="contenedor-links">
+                <a href="">Foros</a>
+                <a href="">Clanes</a>
+                <a href="">Eventos</a>
+                <a href="">Ranking</a>
+                </div>
+                
+            </div>
+            <div class="contenedor contenedor-ayuda">
+                <p>Ayuda</p>
+                <div class="contenedor-links">
+                <a href="">Contacto</a>
+                <a href="">Ayuda</a>
+                </div>
+            </div>
+            <div class="contenedor contenedor-privacidad">
+                <p>Privacidad y terminos</p>
+                <div class="contenedor-links">
+                <a href="">Terminos y servicios</a>
+                <a href="">Cookies, politicas</a>
+                </div>
+            </div>
+            <div class="contenedor contenedor-sobre">
+                <p>Sobre nosotros</p>
+                <div class="contenedor-links">
+                <a href="">Discord</a>
+                <a href="">Twitch</a>
+                <a href="">Youtube</a>
+                </div>
+                
+            </div>
+        </div>
+    </footer>
+
+    <script src="../Segunda-entrega/scripts/menuHamburguesa.js"></script>
+    <script src="../quinta-entrega/scripts/juego.js"></script>
+</body>
+</html>
