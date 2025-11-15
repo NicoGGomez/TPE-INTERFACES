@@ -1,668 +1,555 @@
-// ------------------- Pantallas y botones (igual que antes) -------------------
-const btnPlay = document.getElementById('btn-play');
-const pantallaJuegoInactivo = document.getElementById('pantalla-juego');
-const pantallaJuegoActivo = document.getElementById('pantalla-juego-principal');
+// ---------- Reemplazo: Juego de Nave (Flappy + Shooter) ----------
 
-btnPlay && btnPlay.addEventListener('click', () => {
-    pantallaJuegoInactivo.style.display = 'none';
-    pantallaJuegoActivo.style.display = 'flex';
-});
-
-const btnJugarSolo = document.getElementById('solo');
-const btnMultijugador = document.getElementById('multijugador');
-const btnInstrucciones = document.getElementById('instrucciones');
-const pantallaMultijugador = document.getElementById('pantalla-multijugador');
-const pantallaInstrucciones = document.getElementById('pantalla-instrucciones');
-const pantallaElegirPj = document.getElementById('solitario-piezas');
-const pantallaJuego = document.getElementById('juego-pantalla');
-const btnSalir = document.getElementById('salir');
-
-btnInstrucciones && btnInstrucciones.addEventListener('click', () => {
-    pantallaJuegoActivo.style.display = 'none';
-    pantallaInstrucciones.style.display = 'flex';
-});
-const volverInstrucciones = document.getElementById('volver-instrucciones');
-volverInstrucciones && volverInstrucciones.addEventListener('click', () => {
-    pantallaJuegoActivo.style.display = 'flex';
-    pantallaInstrucciones.style.display = 'none';
-});
-
-btnMultijugador && btnMultijugador.addEventListener('click', () => {
-    pantallaJuegoActivo.style.display = 'none';
-    pantallaMultijugador.style.display = 'flex';
-});
-const volverMultijugador = document.getElementById('volver-multijugador');
-volverMultijugador && volverMultijugador.addEventListener('click', () => {
-    pantallaJuegoActivo.style.display = 'flex';
-    pantallaMultijugador.style.display = 'none';
-});
-
-btnJugarSolo && btnJugarSolo.addEventListener('click', () => {
-    pantallaJuegoActivo.style.display = 'none';
-    pantallaElegirPj.style.display = 'flex';
-});
-
-btnSalir && btnSalir.addEventListener('click', () => {
-    pantallaJuego.style.display = 'none';
-    pantallaJuegoActivo.style.display = 'flex';
-    clearInterval(timerInterval);
-    timerEl.textContent = "⏱️ Tiempo: 120s";
-});
-
-
-
-
-
-const panel = document.getElementById('panel');
-panel.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const selected = panel.querySelector('input[name="pieza"]:checked');
-    // ocultar pantalla de selección
-    pantallaElegirPj.style.display = 'none';
-    pantallaJuego.style.display = 'flex';
-
-    // asignar el personaje seleccionado a las assets
-    const peg = new PegSolitaireGame();
- 
-    if(selected.value === "ficha") 
-        peg.assets.urls.ficha = "https://i.postimg.cc/G3YB35w3/personaje1.jpg";
-    else if(selected.value === "ficha2") 
-        peg.assets.urls.ficha = "https://i.postimg.cc/KvQQQNGw/personaje2.jpg";
-    else if(selected.value === "ficha3")
-        peg.assets.urls.ficha = "https://i.postimg.cc/63GxFJMK/Untitled-Project-6.jpg";
-
-    await peg.startGame(); // startGame ya carga la imagen y arranca el tablero
-});
-
-// ------------------- Peg Solitaire - POO + Drag & Drop -------------------
-
-class Assets {
+/* --------- Assets --------- */
+class GameAssets {
     constructor() {
-        this.images = {
-            ficha: null,
-            ficha2: null,
-            ficha3: null
-        };
+        this.images = {};
         this.urls = {
-            ficha: 'https://i.postimg.cc/G3YB35w3/personaje1.jpg',
-            ficha2: 'https://i.postimg.cc/KvQQQNGw/personaje2.jpg',
-            ficha3: 'https://i.postimg.cc/63GxFJMK/Untitled-Project-6.jpg'
+            bg_far: "https://i.postimg.cc/fTnR2R3V/bg-far.jpg",       // capa 4 (más lejos)
+            bg_mid2: "https://i.postimg.cc/Fs5HWHfj/bg-mid3.png",     // capa 3
+            bg_mid1: "https://i.postimg.cc/pXbLGL9p/bg-mid2.png",     // capa 2
+            bg_front: "https://i.postimg.cc/s2Q9kJ6y/bg_front.png",   // capa 1 (más cerca)
+            ship_sprites: "https://i.postimg.cc/qMVvbvtt/ship-sprites.png", // sprite: flame frames + ship
+            explosion_sprites: "https://i.postimg.cc/7P6kTQ2v/explosion.png",
+            enemy_sprite: "https://i.postimg.cc/9f2t1K6n/enemy.png",
+            cloud_sprite: "https://i.postimg.cc/W4sYv3gF/cloud.png",
+            bonus_sprite: "https://i.postimg.cc/ZR6yqk4v/bonus.png"
         };
     }
-
-    preloadImage(url) {
+    preloadImage(key, url) {
         return new Promise((resolve, reject) => {
             const img = new Image();
             img.crossOrigin = "anonymous";
-            img.onload = () => resolve(img);
-            img.onerror = reject;
+            img.onload = () => { this.images[key] = img; resolve(img); };
+            img.onerror = () => { console.warn("Error cargando:", url); resolve(null); };
             img.src = url;
         });
     }
-
     async preloadAll() {
-        const [ficha, ficha2] = await Promise.all([
-            this.preloadImage(this.urls.ficha).catch(() => null),
-            this.preloadImage(this.urls.ficha2).catch(() => null)
-        ]);
-        this.images.ficha = ficha;
-        this.images.ficha2 = ficha2;
+        const promises = Object.entries(this.urls).map(([k, url]) => this.preloadImage(k, url));
+        await Promise.all(promises);
     }
 }
 
+/* --------- Parallax Layer --------- */
+class ParallaxLayer {
+    constructor(img, speed) {
+        this.img = img;
+        this.speed = speed;
+        this.x = 0;
+    }
+    update(dt, playerSpeed) {
+        // avanza relativo al jugador
+        this.x -= this.speed * playerSpeed * dt;
+        // loop
+        if (this.img) {
+            const w = this.img.width;
+            if (this.x <= -w) this.x += w;
+            if (this.x >= w) this.x -= w;
+        }
+    }
+    draw(ctx, canvas) {
+        if (!this.img) {
+            // fondo de respaldo
+            ctx.fillStyle = "#87CEEB";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            return;
+        }
+        const w = this.img.width;
+        let startX = Math.floor(this.x);
+        // dibujar suficientes veces para cubrir pantalla
+        for (let sx = startX; sx < canvas.width; sx += w) {
+            ctx.drawImage(this.img, sx, 0, w, canvas.height);
+        }
+        // también una imagen a la izquierda por si queda espacio
+        for (let sx = startX - w; sx > -w; sx -= w) {
+            ctx.drawImage(this.img, sx, 0, w, canvas.height);
+        }
+    }
+}
 
-/* =========================
-   Temporizador regresivo
-   ========================= */
-class GameTimer {
-    constructor(displayEl, initialSeconds = 120, onExpire = () => {}) {
-        this.displayEl = displayEl;
-        this.initialSeconds = initialSeconds;
-        this.seconds = initialSeconds;
-        this.interval = null;
-        this.onExpire = onExpire;
+/* --------- Ship (jugador) --------- */
+class Ship {
+    constructor(imgSprites) {
+        this.sprite = imgSprites; // spritesheet
+        this.x = 120;
+        this.y = 200;
+        this.vy = 0;
+        this.width = 64;
+        this.height = 48;
+        this.gravity = 1200; // px/s^2
+        this.flapStrength = -420; // impulso
+        this.maxFallSpeed = 800;
+        this.alive = true;
+        this.lives = 3;
+        this.score = 0;
+
+        // animación de propulsores (supongamos 4 frames horizontales)
+        this.flameFrames = 4;
+        this.flameFrameTime = 0.06;
+        this.flameTimer = 0;
+        this.flameIndex = 0;
+
+        // explosión state
+        this.exploding = false;
+        this.explosionTimer = 0;
     }
 
-    start() {
-        this.stop();
-        this.seconds = this.initialSeconds;
-        this._render();
-        this.interval = setInterval(() => {
-            this.seconds--;
-            this._render();
-            if (this.seconds <= 0) {
-                this.stop();
-                this.onExpire();
+    flap() {
+        if (!this.alive) return;
+        this.vy = this.flapStrength;
+        // encender propulsores (reset anim)
+        this.flameTimer = 0;
+        this.flameIndex = 0;
+    }
+
+    update(dt) {
+        if (!this.alive) return;
+        // física vertical
+        this.vy += this.gravity * dt;
+        if (this.vy > this.maxFallSpeed) this.vy = this.maxFallSpeed;
+        this.y += this.vy * dt;
+
+        // límites pantalla
+        if (this.y < 10) { this.y = 10; this.vy = 0; }
+        // anim flame
+        this.flameTimer += dt;
+        if (this.flameTimer >= this.flameFrameTime) {
+            this.flameTimer -= this.flameFrameTime;
+            this.flameIndex = (this.flameIndex + 1) % this.flameFrames;
+        }
+    }
+
+    draw(ctx) {
+        if (this.exploding) {
+            // no dibujar nave, explosion manejada por Game.explosionDraw
+            return;
+        }
+        if (this.sprite) {
+            // suponemos: sprite ancho = (flameFrames + 1) * frameW
+            const frameW = this.sprite.width / (this.flameFrames + 1);
+            const frameH = this.sprite.height;
+            // dibujar nave (último frame)
+            const shipFrameIndex = this.flameFrames; // último frame es la nave quieta
+            ctx.drawImage(this.sprite, shipFrameIndex * frameW, 0, frameW, frameH,
+                          this.x - this.width/2, this.y - this.height/2, this.width, this.height);
+            // dibujar flame debajo si está flap (si vy < 0 o se acaba de flapear)
+            if (this.vy < 0 || this.flameIndex !== 0) {
+                const fx = this.flameIndex * frameW;
+                ctx.drawImage(this.sprite, fx, 0, frameW, frameH,
+                              this.x - this.width/2 - 6, this.y - this.height/2 + 10, this.width * 0.9, this.height * 0.9);
             }
-        }, 1000);
+        } else {
+            // fallback: rectángulo
+            ctx.fillStyle = "#FFD700";
+            ctx.fillRect(this.x - this.width/2, this.y - this.height/2, this.width, this.height);
+        }
     }
 
-    stop() {
-        if (this.interval) clearInterval(this.interval);
-        this.interval = null;
+    getBounds() {
+        return { x: this.x - this.width/2, y: this.y - this.height/2, w: this.width, h: this.height };
     }
 
-    _render() {
-        if (this.displayEl) this.displayEl.textContent = `⏱️ Tiempo: ${this.seconds}s`;
-    }
-
-    getRemaining() {
-        return this.seconds;
+    hit() {
+        this.lives--;
+        if (this.lives <= 0) {
+            this.alive = false;
+            this.exploding = true;
+            this.explosionTimer = 0;
+        }
     }
 }
 
-
-/* =========================
-   Tablero y lógica de juego
-   ========================= */
-class PegBoard {
-    constructor(canvas, assets, cellSize = 50) {
-        this.canvas = canvas;
-        this.ctx = canvas ? canvas.getContext('2d') : null;
-        this.assets = assets;
-        this.cellSize = cellSize;
-        this.board = [];
-        this.selected = null;
-        this.dragging = null;
-        this.dragOffset = { x: 0, y: 0 };
-        this.hints = [];
-        this.hintAnimation = 0;
-        this.animRunning = false;
-
-        this.offsetX = 0;
-        this.offsetY = 0;
+/* --------- Obstáculos, enemies y bonuses --------- */
+class Obstacle {
+    constructor(x, y, w, h, type = "pipe") {
+        this.x = x; this.y = y;
+        this.w = w; this.h = h;
+        this.type = type; // pipe, enemy, bonus
+        this.dead = false;
+        this.speed = 200;
+        this.animTimer = 0;
     }
-
-    initBoard() {
-        this.board = [];
-        for (let y = 0; y < 7; y++) {
-            this.board[y] = [];
-            for (let x = 0; x < 7; x++) {
-                if ((x < 2 && y < 2) || (x > 4 && y < 2) || (x < 2 && y > 4) || (x > 4 && y > 4))
-                    this.board[y][x] = null;
-                else this.board[y][x] = 1;
+    update(dt, playerSpeed) {
+        this.x -= this.speed * playerSpeed * dt;
+        // simple anim
+        this.animTimer += dt;
+    }
+    draw(ctx, assets) {
+        if (this.type === "pipe") {
+            ctx.fillStyle = "#2E8B57";
+            ctx.fillRect(this.x, this.y, this.w, this.h);
+            // rim edge
+            ctx.strokeStyle = "#124";
+            ctx.strokeRect(this.x, this.y, this.w, this.h);
+        } else if (this.type === "enemy") {
+            const img = assets.images.enemy_sprite;
+            if (img) ctx.drawImage(img, this.x, this.y, this.w, this.h);
+            else {
+                ctx.fillStyle = "red";
+                ctx.fillRect(this.x, this.y, this.w, this.h);
+            }
+        } else if (this.type === "bonus") {
+            const img = assets.images.bonus_sprite;
+            if (img) ctx.drawImage(img, this.x, this.y, this.w, this.h);
+            else {
+                ctx.fillStyle = "gold";
+                ctx.fillRect(this.x, this.y, this.w, this.h);
             }
         }
-        this.board[3][3] = 0;
-        this.selected = null;
-        this.hints = [];
+    }
+    getBounds() { return { x: this.x, y: this.y, w: this.w, h: this.h }; }
+}
+
+/* --------- Manager de Obstáculos --------- */
+class ObstacleManager {
+    constructor(canvas, assets) {
+        this.canvas = canvas;
+        this.assets = assets;
+        this.obstacles = [];
+        this.spawnTimer = 0;
+        this.spawnInterval = 1.4;
+        this.speedMultiplier = 1;
     }
 
-    resizeCanvasTo(w = 400, h = 400) {
-        const ratio = window.devicePixelRatio || 1;
-        this.canvas.style.width = `${w}px`;
-        this.canvas.style.height = `${h}px`;
-        this.canvas.width = Math.floor(w * ratio);
-        this.canvas.height = Math.floor(h * ratio);
-        this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-        this.offsetX = (this.canvas.clientWidth - 7 * this.cellSize) / 2;
-        this.offsetY = (this.canvas.clientHeight - 7 * this.cellSize) / 2;
+    update(dt) {
+        this.spawnTimer += dt;
+        if (this.spawnTimer >= this.spawnInterval) {
+            this.spawnTimer -= this.spawnInterval;
+            this._spawnPair();
+        }
+        // update existing
+        for (const o of this.obstacles) o.update(dt, this.speedMultiplier);
+        // limpiar fuera de pantalla o muertos
+        this.obstacles = this.obstacles.filter(o => (o.x + o.w > -50) && !o.dead);
     }
 
-    getCellFromCoords(clientX, clientY) {
-        const rect = this.canvas.getBoundingClientRect();
-        const mx = clientX - rect.left;
-        const my = clientY - rect.top;
-        const x = Math.floor((mx - this.offsetX) / this.cellSize);
-        const y = Math.floor((my - this.offsetY) / this.cellSize);
-        if (x >= 0 && x < 7 && y >= 0 && y < 7 && this.board[y][x] !== null) return { x, y };
+    _spawnPair() {
+        const gap = 140; // gap vertical
+        const minH = 60;
+        const maxH = this.canvas.height - gap - 120;
+        const topH = minH + Math.random() * (maxH - minH);
+        const pipeW = 72;
+        // top pipe
+        this.obstacles.push(new Obstacle(this.canvas.width + 40, 0, pipeW, topH, "pipe"));
+        // bottom pipe
+        this.obstacles.push(new Obstacle(this.canvas.width + 40, topH + gap, pipeW, this.canvas.height - (topH + gap), "pipe"));
+        // small chance spawn enemy
+        if (Math.random() < 0.3) {
+            const ey = 40 + Math.random() * (this.canvas.height - 80);
+            this.obstacles.push(new Obstacle(this.canvas.width + 120, ey, 48, 36, "enemy"));
+        }
+        // small chance bonus
+        if (Math.random() < 0.2) {
+            const by = 40 + Math.random() * (this.canvas.height - 80);
+            this.obstacles.push(new Obstacle(this.canvas.width + 200, by, 36, 36, "bonus"));
+        }
+    }
+
+    draw(ctx) {
+        for (const o of this.obstacles) o.draw(ctx, this.assets);
+    }
+
+    checkCollisions(ship) {
+        const s = ship.getBounds();
+        for (const o of this.obstacles) {
+            const b = o.getBounds();
+            if (this._intersectRect(s, b)) {
+                return o;
+            }
+        }
         return null;
     }
 
-    // VERIFICACION DEL MOVIMIENTO ANTES DE LA REVISION
+    _intersectRect(a, b) {
+        return !(a.x + a.w < b.x || a.x > b.x + b.w || a.y + a.h < b.y || a.y > b.y + b.h);
+    }
 
-    // isValidMove(from, to) {
-    //     if (!from || !to) return false;
-    //     if (this.board[to.y][to.x] !== 0) return false;
-    //     const dx = to.x - from.x;
-    //     const dy = to.y - from.y;
-    //     if (Math.abs(dx) === 2 && dy === 0) return this.board[from.y][from.x + dx / 2] === 1;
-    //     if (Math.abs(dy) === 2 && dx === 0) return this.board[from.y + dy / 2][from.x] === 1;
-    //     return false;
-    // }
-
-    isValidMove(from, to) {
-        if (!from || !to) return false;
-        if (this.board[to.y][to.x] !== 0) return false;
-
-        const dx = to.x - from.x;
-        const dy = to.y - from.y;
-
-        // salto de una ficha
-        if (Math.abs(dx) === 2 && dy === 0)
-            return this.board[from.y][from.x + dx / 2] === 1;
-        if (Math.abs(dy) === 2 && dx === 0)
-            return this.board[from.y + dy / 2][from.x] === 1;
-
-        // salto de dos fichas seguidas (3 espacios)
-        if (Math.abs(dx) === 3 && dy === 0)
-            return this.board[from.y][from.x + dx / 3] === 1 &&
-                this.board[from.y][from.x + (2 * dx) / 3] === 1;
-        if (Math.abs(dy) === 3 && dx === 0)
-            return this.board[from.y + dy / 3][from.x] === 1 &&
-                this.board[from.y + (2 * dy) / 3][from.x] === 1;
-
+    shoot(x, y) {
+        // simple: buscar primer obstáculo en línea de tiro y marcar dead
+        for (const o of this.obstacles) {
+            if (o.x < x + 300 && o.x > x && Math.abs((o.y + o.h/2) - y) < 60 && o.type !== "bonus") {
+                o.dead = true;
+                return true;
+            }
+        }
         return false;
     }
-
-    // MOVIMIENTO ANTES DE LA REVISION
-
-    // makeMove(from, to) {
-    //     const dx = to.x - from.x;
-    //     const dy = to.y - from.y;
-    //     this.board[from.y][from.x] = 0;
-    //     this.board[to.y][to.x] = 1;
-    //     this.board[from.y + dy / 2][from.x + dx / 2] = 0;
-    // }
-
-    makeMove(from, to) {
-        const dx = to.x - from.x;
-        const dy = to.y - from.y;
-
-        this.board[from.y][from.x] = 0;
-        this.board[to.y][to.x] = 1;
-
-        // salto de una ficha
-        if (Math.abs(dx) === 2 && dy === 0)
-            this.board[from.y][from.x + dx / 2] = 0;
-        else if (Math.abs(dy) === 2 && dx === 0)
-            this.board[from.y + dy / 2][from.x] = 0;
-
-        // salto de dos fichas seguidas
-        else if (Math.abs(dx) === 3 && dy === 0) {
-            this.board[from.y][from.x + dx / 3] = 0;
-            this.board[from.y][from.x + (2 * dx) / 3] = 0;
-        } else if (Math.abs(dy) === 3 && dx === 0) {
-            this.board[from.y + dy / 3][from.x] = 0;
-            this.board[from.y + (2 * dy) / 3][from.x] = 0;
-        }
-    }
-
-    checkWin() {
-        let count = 0;
-        for (let y = 0; y < 7; y++)
-            for (let x = 0; x < 7; x++)
-                if (this.board[y][x] === 1) count++;
-        return count === 1 && this.board[3][3] === 1;
-    }
-
-    // SHOWHINTS ANTES DE LA REVISION
-
-    // showHints(from) {
-    //     this.hints = [];
-    //     if (!from) return;
-    //     const dirs = [
-    //         { dx: 2, dy: 0 },
-    //         { dx: -2, dy: 0 },
-    //         { dx: 0, dy: 2 },
-    //         { dx: 0, dy: -2 },
-    //     ];
-    //     dirs.forEach(dir => {
-    //         const to = { x: from.x + dir.dx, y: from.y + dir.dy };
-    //         if (to.x >= 0 && to.x < 7 && to.y >= 0 && to.y < 7 && this.isValidMove(from, to))
-    //             this.hints.push(to);
-    //     });
-    // }
-
-    showHints(from) {
-        this.hints = [];
-        if (!from) return;
-
-        const dirs = [
-            { dx: 2, dy: 0 },
-            { dx: -2, dy: 0 },
-            { dx: 0, dy: 2 },
-            { dx: 0, dy: -2 },
-            { dx: 3, dy: 0 },  // salto doble horizontal
-            { dx: -3, dy: 0 },
-            { dx: 0, dy: 3 },  // salto doble vertical
-            { dx: 0, dy: -3 }
-        ];
-
-        dirs.forEach(dir => {
-            const to = { x: from.x + dir.dx, y: from.y + dir.dy };
-            if (
-                to.x >= 0 && to.x < 7 &&
-                to.y >= 0 && to.y < 7 &&
-                this.isValidMove(from, to)
-            ) {
-                this.hints.push(to);
-            }
-        });
-    }
-
-
-    _drawHoles() {
-    for (let y = 0; y < 7; y++) {
-        for (let x = 0; x < 7; x++) {
-            if (this.board[y][x] !== null) { // todas las celdas válidas
-                const px = this.offsetX + x * this.cellSize + this.cellSize / 2;
-                const py = this.offsetY + y * this.cellSize + this.cellSize / 2;
-                const radius = (this.cellSize - 10) / 2;
-
-                this.ctx.beginPath();
-                this.ctx.fillStyle = "#0F3A50"; // color del agujero
-                this.ctx.arc(px, py, radius, 0, Math.PI * 2);
-                this.ctx.fill();
-
-                this.ctx.strokeStyle = "#15394eff"; // borde del agujero
-                this.ctx.lineWidth = 2;
-                this.ctx.stroke();
-            }
-        }
-    }
-    }
-
-    draw() {
-        this.ctx.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
-        this.offsetX = (this.canvas.clientWidth - 7 * this.cellSize) / 2;
-        this.offsetY = (this.canvas.clientHeight - 7 * this.cellSize) / 2;
-
-        this.ctx.fillStyle = "#1E5474";
-        this.ctx.fillRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
-
-        // celdas
-        for (let y = 0; y < 7; y++) {
-            for (let x = 0; x < 7; x++) {
-                if (this.board[y][x] !== null) {
-                    this.ctx.strokeStyle = "#1E5474";
-                    this.ctx.strokeRect(
-                        this.offsetX + x * this.cellSize,
-                        this.offsetY + y * this.cellSize,
-                        this.cellSize,
-                        this.cellSize
-                    );
-                }
-            }
-        }
-
-        // dibujar "agujeros" en celdas vacías
-        this._drawHoles();
-
-        // fichas
-        for (let y = 0; y < 7; y++) {
-            for (let x = 0; x < 7; x++) {
-                if (this.board[y][x] === 1) {
-                    if (this.dragging && this.dragging.from.x === x && this.dragging.from.y === y)
-                        continue; 
-                    this._drawPiece(x, y);
-                }
-            }
-        }
-
-        // ficha arrastrada
-        if (this.dragging) {
-            const img = this.assets.images.ficha;
-            const px = this.dragging.x - this.dragOffset.x;
-            const py = this.dragging.y - this.dragOffset.y;
-            const size = this.cellSize - 10;
-            const radius = 50;
-
-            if (img) {
-                this.ctx.save();
-                this.ctx.beginPath();
-                this.ctx.roundRect(px + 5, py + 5, size, size, radius);
-                this.ctx.clip();
-                this.ctx.drawImage(img, px + 5, py + 5, size, size);
-                this.ctx.restore();
-            } else {
-                this.ctx.beginPath();
-                this.ctx.fillStyle = "#DF9430";
-                this.ctx.arc(px + this.cellSize / 2, py + this.cellSize / 2, size / 2, 0, Math.PI * 2);
-                this.ctx.fill();
-            }
-        }
-
-        // hints
-        this._drawHints();
-    }
-
-    _drawPiece(x, y) {
-    const px = this.offsetX + x * this.cellSize;
-    const py = this.offsetY + y * this.cellSize;
-    const img = this.assets.images.ficha;
-    const size = this.cellSize - 10;
-    const radius = 50;
-
-    if (img) {
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.roundRect(px + 5, py + 5, size, size, radius);
-        this.ctx.clip();
-        this.ctx.drawImage(img, px + 5, py + 5, size, size);
-        this.ctx.restore();
-    } else {
-        this.ctx.beginPath();
-        this.ctx.fillStyle = "#DF9430";
-        this.ctx.arc(px + this.cellSize / 2, py + this.cellSize / 2, size / 2, 0, Math.PI * 2);
-        this.ctx.fill();
-    }
-    }
-
-
-    _drawHints() {
-        this.hintAnimation += 0.12;
-        for (const h of this.hints) {
-            const px = this.offsetX + h.x * this.cellSize + this.cellSize / 2;
-            const py = this.offsetY + h.y * this.cellSize + this.cellSize / 2 + 8 * Math.sin(this.hintAnimation);
-            this.ctx.beginPath();
-            this.ctx.fillStyle = "rgba(72, 255, 31, 0.8)";
-            this.ctx.arc(px, py - 8, 8 + 2 * Math.sin(this.hintAnimation), 0, Math.PI * 2);
-            this.ctx.fill();
-        }
-    }
-
-    startAnimationLoop() {
-        if (this.animRunning) return;
-        this.animRunning = true;
-        const loop = () => {
-            if (!this.animRunning) return;
-            this.draw();
-            requestAnimationFrame(loop);
-        };
-        requestAnimationFrame(loop);
-    }
-
-    stopAnimationLoop() {
-        this.animRunning = false;
-    }
-
-    onMouseDown(clientX, clientY) {
-    const cell = this.getCellFromCoords(clientX, clientY);
-    if (!cell) return;
-
-    if (this.board[cell.y][cell.x] === 1) {
-        this.dragging = {
-            from: { x: cell.x, y: cell.y },
-            x: clientX - this.canvas.getBoundingClientRect().left,
-            y: clientY - this.canvas.getBoundingClientRect().top
-        };
-        this.dragOffset.x = this.cellSize / 2;
-        this.dragOffset.y = this.cellSize / 2;
-
-        // <-- ACA agregamos esto
-        this.showHints(cell);
-    }
-    }
-
-
-    onMouseMove(clientX, clientY) {
-        if (!this.dragging) return;
-        const rect = this.canvas.getBoundingClientRect();
-        this.dragging.x = clientX - rect.left;
-        this.dragging.y = clientY - rect.top;
-    }
-
-    onMouseUp(clientX, clientY, onMoveMade = () => {}) {
-    if (!this.dragging) return;
-    const from = this.dragging.from;
-    const cell = this.getCellFromCoords(clientX, clientY);
-    if (cell && this.isValidMove(from, cell)) {
-        this.makeMove(from, cell);
-        onMoveMade();
-    }
-    this.dragging = null;
-    this.hints = []; // <-- limpia los hints
-    }
-
-    hasMovesLeft() {
-    for (let y = 0; y < 7; y++) {
-        for (let x = 0; x < 7; x++) {
-            if (this.board[y][x] === 1) {
-                const from = { x, y };
-                const dirs = [
-                    { dx: 2, dy: 0 },
-                    { dx: -2, dy: 0 },
-                    { dx: 0, dy: 2 },
-                    { dx: 0, dy: -2 }
-                ];
-                for (const dir of dirs) {
-                    const to = { x: x + dir.dx, y: y + dir.dy };
-                    if (to.x >= 0 && to.x < 7 && to.y >= 0 && to.y < 7 && this.isValidMove(from, to)) {
-                        return true; // hay al menos un movimiento
-                    }
-                }
-            }
-        }
-    }
-    return false; // no hay movimientos
-    }
-
-
 }
 
-/* =========================
-   Clase principal
-   ========================= */
-class PegSolitaireGame {
+/* --------- Game principal --------- */
+class SpaceGame {
     constructor() {
+        // referencias UI (las tuyas ya existentes)
         this.canvas = document.getElementById('canvas');
+        this.ctx = this.canvas.getContext('2d');
         this.timerEl = document.getElementById('timer');
         this.pantallaJuego = document.getElementById('juego-pantalla');
         this.pantallaMenu = document.getElementById('pantalla-juego-principal');
-        this.btnPlay = document.getElementById('btn-play');
         this.btnReiniciar = document.getElementById('reiniciar');
         this.btnSalir = document.getElementById('salir');
 
-        this.img = ''
-        this.assets = new Assets();
-        this.board = new PegBoard(this.canvas, this.assets, 50);
-        this.timer = new GameTimer(this.timerEl, 120, this.onTimeUp.bind(this));
+        // botón disparo (puede estar en HTML)
+        this.btnShoot = document.getElementById('btn-shoot');
+
+        this.assets = new GameAssets();
+        this.layers = [];
+        this.ship = null;
+        this.obManager = null;
+
+        // control
+        this.lastTime = 0;
+        this.running = false;
+
+        // UI scoreboard
+        this.scoreEl = document.getElementById('score') || null;
+        this.livesEl = document.getElementById('lives') || null;
+
+        // tiempo (si querés mantener GameTimer)
+        this.gameTimer = new GameTimer(this.timerEl, 120, this.onTimeUp.bind(this));
 
         this._bindUI();
-        this._bindCanvasEvents();
+        this._bindInput();
     }
 
     _bindUI() {
-        this.btnReiniciar?.addEventListener('click', () => {
-            this.startGame();
-        });
+        this.btnReiniciar?.addEventListener('click', () => this.start());
         this.btnSalir?.addEventListener('click', () => {
+            this.stop();
             this.pantallaJuego.style.display = 'none';
             this.pantallaMenu.style.display = 'flex';
-            this.stopGame();
+        });
+        this.btnShoot?.addEventListener('click', () => {
+            this._shoot();
         });
     }
 
-    _bindCanvasEvents() {
-        let isDown = false;
-
-        this.canvas.addEventListener('mousedown', (e) => {
-            isDown = true;
-            this.board.onMouseDown(e.clientX, e.clientY);
+    _bindInput() {
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') { e.preventDefault(); this._flap(); }
+            if (e.code === 'KeyF') this._shoot();
         });
-        this.canvas.addEventListener('mousemove', (e) => {
-            if (isDown) this.board.onMouseMove(e.clientX, e.clientY);
-        });
-        this.canvas.addEventListener('mouseup', (e) => {
-            isDown = false;
-            this.board.onMouseUp(e.clientX, e.clientY, () => {
-                if (this.board.checkWin()) {
-                    this.onWin();
-                } else if (!this.board.hasMovesLeft()) {
-                    this.onLose();
-                }
-            });
-        });
-
-        // soporte táctil
-        this.canvas.addEventListener('touchstart', (e) => {
-            const t = e.touches[0];
-            this.board.onMouseDown(t.clientX, t.clientY);
-        });
-        this.canvas.addEventListener('touchmove', (e) => {
-            const t = e.touches[0];
-            this.board.onMouseMove(t.clientX, t.clientY);
-        });
-        this.canvas.addEventListener('touchend', (e) => {
-            const t = e.changedTouches[0];
-            this.board.onMouseUp(t.clientX, t.clientY, () => {
-                if (this.board.checkWin()) {
-                    this.onWin();
-                } else if (!this.board.hasMovesLeft()) {
-                    this.onLose();
-                }
-            });
-        });
-    
+        // click / touch to flap
+        this.canvas.addEventListener('mousedown', (e) => { this._flap(); });
+        this.canvas.addEventListener('touchstart', (e) => { this._flap(); });
     }
 
-    async startGame() {
+    async start() {
         await this.assets.preloadAll();
-        this.board.resizeCanvasTo(400, 400);
-        this.board.initBoard();
-        this.timer.start();
-        this.board.startAnimationLoop();
+        this._setupWorld();
+        this.gameTimer.start();
+        this.running = true;
+        this.lastTime = performance.now();
+        requestAnimationFrame(this._loop.bind(this));
     }
 
-    stopGame() {
-        this.timer.stop();
-        this.board.stopAnimationLoop();
+    stop() {
+        this.running = false;
+        this.gameTimer.stop();
+    }
+
+    _setupWorld() {
+        // dimensionar canvas
+        const ratio = window.devicePixelRatio || 1;
+        const w = 800;
+        const h = 480;
+        this.canvas.style.width = w + "px";
+        this.canvas.style.height = h + "px";
+        this.canvas.width = Math.floor(w * ratio);
+        this.canvas.height = Math.floor(h * ratio);
+        this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+        // parallax 4 capas (más lejos -> más lento)
+        this.layers = [
+            new ParallaxLayer(this.assets.images.bg_far, 0.15),
+            new ParallaxLayer(this.assets.images.bg_mid2, 0.4),
+            new ParallaxLayer(this.assets.images.bg_mid1, 0.75),
+            new ParallaxLayer(this.assets.images.bg_front, 1.2)
+        ];
+
+        this.ship = new Ship(this.assets.images.ship_sprites);
+        this.obManager = new ObstacleManager(this.canvas, this.assets);
+
+        // UI
+        if (this.scoreEl) this.scoreEl.textContent = `Score: 0`;
+        if (this.livesEl) this.livesEl.textContent = `Lives: ${this.ship.lives}`;
+    }
+
+    _loop(ts) {
+        if (!this.running) return;
+        const dt = Math.min((ts - this.lastTime) / 1000, 0.05);
+        this.lastTime = ts;
+
+        // update world
+        const playerSpeed = 1; // factor
+        this.layers.forEach(l => l.update(dt, playerSpeed));
+        this.ship.update(dt);
+        this.obManager.update(dt);
+
+        // colisiones
+        const hitObs = this.obManager.checkCollisions(this.ship);
+        if (hitObs) {
+            if (hitObs.type === "bonus") {
+                hitObs.dead = true;
+                this.ship.score += 10;
+            } else {
+                // daño
+                hitObs.dead = true;
+                this.ship.hit();
+            }
+            this._updateUI();
+        }
+
+        // update puntuación por pasar obstáculos (simple heuristic)
+        for (const o of this.obManager.obstacles) {
+            if (!o._scored && o.x + o.w < this.ship.x) {
+                o._scored = true;
+                if (o.type === "pipe") this.ship.score += 1;
+            }
+        }
+
+        // limpiar explosion y terminar si muerto
+        if (this.ship.exploding) {
+            this.ship.explosionTimer += dt;
+            if (this.ship.explosionTimer > 1.2) {
+                // Game over
+                this.running = false;
+                this._gameOver();
+                return;
+            }
+        }
+
+        // draw
+        this._draw();
+
+        // win/lose timeouts
+        if (this.gameTimer.getRemaining() <= 0) {
+            this.running = false;
+            this._gameOver();
+            return;
+        }
+
+        requestAnimationFrame(this._loop.bind(this));
+    }
+
+    _draw() {
+        // limpiar
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // dibujar parallax
+        for (const l of this.layers) l.draw(this.ctx, this.canvas);
+
+        // dibujar obstáculos
+        this.obManager.draw(this.ctx);
+
+        // dibujar objetos animados extra (nubes)
+        const cloud = this.assets.images.cloud_sprite;
+        if (cloud) {
+            // mostrar algunas nubes
+            this.ctx.globalAlpha = 0.8;
+            this.ctx.drawImage(cloud, (this.layers[1].x % this.canvas.width + 200) % this.canvas.width, 40, 120, 48);
+            this.ctx.globalAlpha = 1;
+        }
+
+        // dibujar nave
+        this.ship.draw(this.ctx);
+
+        // dibujar explosion si corresponde
+        if (this.ship.exploding && this.assets.images.explosion_sprites) {
+            const exp = this.assets.images.explosion_sprites;
+            const frames = 6;
+            const t = this.ship.explosionTimer;
+            const idx = Math.floor((t / 1.2) * frames);
+            const fw = exp.width / frames;
+            const fh = exp.height;
+            this.ctx.drawImage(exp, Math.min(idx, frames-1) * fw, 0, fw, fh,
+                               this.ship.x - 48, this.ship.y - 48, 96, 96);
+        }
+
+        // HUD
+        this.ctx.fillStyle = "white";
+        this.ctx.font = "18px Arial";
+        this.ctx.fillText(`Score: ${this.ship.score}`, 18, 26);
+        this.ctx.fillText(`Lives: ${this.ship.lives}`, 18, 48);
+        this.ctx.fillText(`Time: ${this.gameTimer.getRemaining()}s`, 18, 70);
+    }
+
+    _flap() {
+        if (!this.running) return;
+        this.ship.flap();
+    }
+
+    _shoot() {
+        if (!this.running) return;
+        // efecto visual rápido (línea) y llamar manager
+        const sx = this.ship.x + 30;
+        const sy = this.ship.y;
+        const success = this.obManager.shoot(sx, sy);
+        if (success) {
+            // sumar puntaje por destruir
+            this.ship.score += 2;
+            this._flashShot(sx, sy);
+            this._updateUI();
+        }
+    }
+
+    _flashShot(x, y) {
+        // simple trazo que desaparece
+        const ctx = this.ctx;
+        ctx.save();
+        ctx.strokeStyle = "yellow";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(this.ship.x + 12, this.ship.y);
+        ctx.lineTo(x + 300, y);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    _updateUI() {
+        if (this.scoreEl) this.scoreEl.textContent = `Score: ${this.ship.score}`;
+        if (this.livesEl) this.livesEl.textContent = `Lives: ${this.ship.lives}`;
+    }
+
+    _gameOver() {
+        // parar timer
+        this.gameTimer.stop();
+        // mostrar pantalla perdida (reusar tus nodos de gan/lose si existen)
+        const perdedor = document.getElementById('perdedor');
+        const ganador = document.getElementById('ganador');
+        if (perdedor) {
+            const miDiv = document.getElementById('miDivPer');
+            miDiv.innerHTML = `<p>Juego terminado. Puntaje: ${this.ship.score}</p>`;
+            this.pantallaJuego.style.display = 'none';
+            perdedor.style.display = 'flex';
+            document.getElementById('btn-volver-per')?.addEventListener('click', () => {
+                perdedor.style.display = 'none';
+                this.pantallaMenu.style.display = 'flex';
+            });
+        } else {
+            alert(`Juego terminado. Puntaje: ${this.ship.score}`);
+            this.pantallaMenu.style.display = 'flex';
+        }
     }
 
     onTimeUp() {
-        this.stopGame();
-        const perdedor = document.getElementById('perdedor'); // Obtiene el elemento que muestra la pantalla de perdedor
-        const miDiv = document.getElementById('miDivPer');
-        this.stopGame();
-        miDiv.innerHTML = `<p>No quedan más tiempo. ¡Perdiste!</p>`;
-        this.pantallaJuego.style.display = 'none';
-        perdedor.style.display = 'flex';
-        document.getElementById('btn-volver-per').addEventListener('click', () => {
-            perdedor.style.display = 'none';
-            this.pantallaMenu.style.display = 'flex'; 
-        })
+        this.running = false;
+        this._gameOver();
     }
-
-    onWin() {
-        this.timer.stop();
-        // alert(`🎉 ¡Ganaste con ${this.timer.getRemaining()}s restantes!`);
-        // this.stopGame();
-        const ganador = document.getElementById('ganador'); // Obtiene el elemento que muestra la pantalla de ganador
-        const miDiv = document.getElementById('miDivGa');
-        miDiv.innerHTML = `<¡Ganaste con ${this.timer.getRemaining()}s restantes!`;
-        this.pantallaJuego.style.display = 'none';
-        ganador.style.display = 'flex';
-        document.getElementById('btn-volver-ga').addEventListener('click', () => {
-            ganador.style.display = 'none';
-            this.pantallaMenu.style.display = 'flex'; 
-        })
-    }
-
-    onLose() {
-        this.timer.stop();
-        // alert("💀 No quedan más movimientos. ¡Perdiste!");
-        const perdedor = document.getElementById('perdedor'); // Obtiene el elemento que muestra la pantalla de perdedor
-        const miDiv = document.getElementById('miDivPer');
-        this.stopGame();
-        miDiv.innerHTML = `<p>No quedan más movimientos. ¡Perdiste!</p>`;
-        this.pantallaJuego.style.display = 'none';
-        perdedor.style.display = 'flex';
-        document.getElementById('btn-volver-per').addEventListener('click', () => {
-            perdedor.style.display = 'none';
-            this.pantallaMenu.style.display = 'flex'; 
-        })
-    }
-
 }
+
+/* --------- Inicialización (reemplaza la creación anterior) --------- */
+let currentGame = null;
+document.addEventListener('DOMContentLoaded', () => {
+    // si ya tenías lógica de selección de personaje: la ignoramos aquí.
+    currentGame = new SpaceGame();
+
+    // arrancar desde tu botón "Play"
+    const btnPlay = document.getElementById('btn-play');
+    btnPlay?.addEventListener('click', () => {
+        document.getElementById('pantalla-juego')?.style.display = 'none';
+        document.getElementById('pantalla-juego-principal')?.style.display = 'none';
+        document.getElementById('juego-pantalla')?.style.display = 'flex';
+        currentGame.start();
+    });
+});
