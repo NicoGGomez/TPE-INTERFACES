@@ -8,12 +8,13 @@ class GameAssets {
             bg_far: "https://i.postimg.cc/fTnR2R3V/bg-far.jpg",       // capa 4 (más lejos)
             bg_mid2: "https://i.postimg.cc/Fs5HWHfj/bg-mid3.png",     // capa 3
             bg_mid1: "https://i.postimg.cc/pXbLGL9p/bg-mid2.png",     // capa 2
-            bg_front: "https://i.postimg.cc/s2Q9kJ6y/bg_front.png",   // capa 1 (más cerca)
+            bg_front: "https://i.postimg.cc/p9LPXsyT/Whats-App-Image-2025-11-16-at-15-20-40-f3d25315.jpg",   // capa 1 (más cerca)
             ship_sprites: "https://i.postimg.cc/qMVvbvtt/ship-sprites.png", // sprite: flame frames + ship
-            explosion_sprites: "https://i.postimg.cc/7P6kTQ2v/explosion.png",
-            enemy_sprite: "https://i.postimg.cc/9f2t1K6n/enemy.png",
-            cloud_sprite: "https://i.postimg.cc/W4sYv3gF/cloud.png",
-            bonus_sprite: "https://i.postimg.cc/ZR6yqk4v/bonus.png"
+            ship_activate_spite: "https://i.postimg.cc/gnVV9bjp/Generated-Image-November-16-2025-4-18PM.png",
+            explosion_sprites: "https://i.postimg.cc/qz4STzNJ/Generated-Image-November-16-2025-3-22PM.png",
+            enemy_sprite: "https://i.postimg.cc/8s04ycLY/Generated-Image-November-16-2025-3-25PM.png",
+            cloud_sprite: "https://i.postimg.cc/ppQ9m1VV/Generated-Image-November-16-2025-3-28PM.png",
+            bonus_sprite: "https://i.postimg.cc/YLrSYtC8/Generated-Image-November-16-2025-3-31PM.png"
         };
     }
     preloadImage(key, url) {
@@ -70,8 +71,9 @@ class ParallaxLayer {
 
 /* --------- Ship (jugador) --------- */
 class Ship {
-    constructor(imgSprites) {
+    constructor(imgSprites, imgActivateSprite) {
         this.sprite = imgSprites; // spritesheet
+        this.activate_spite = imgActivateSprite
         this.x = 120;
         this.y = 200;
         this.vy = 0;
@@ -136,7 +138,7 @@ class Ship {
             // dibujar flame debajo si está flap (si vy < 0 o se acaba de flapear)
             if (this.vy < 0 || this.flameIndex !== 0) {
                 const fx = this.flameIndex * frameW;
-                ctx.drawImage(this.sprite, fx, 0, frameW, frameH,
+                ctx.drawImage(this.activate_spite, fx, 0, frameW, frameH,
                               this.x - this.width/2 - 6, this.y - this.height/2 + 10, this.width * 0.9, this.height * 0.9);
             }
         } else {
@@ -144,6 +146,34 @@ class Ship {
             ctx.fillStyle = "#FFD700";
             ctx.fillRect(this.x - this.width/2, this.y - this.height/2, this.width, this.height);
         }
+    }
+
+    draw(ctx) {
+    if (this.exploding) return;
+
+    if (this.sprite) {
+        const frameW = this.sprite.width / (this.flameFrames + 1);
+        const frameH = this.sprite.height;
+        const shipFrameIndex = this.flameFrames;
+        ctx.drawImage(
+            this.sprite,
+            shipFrameIndex * frameW, 0, frameW, frameH,
+            this.x - this.width/2, this.y - this.height/2,
+            this.width, this.height
+        );
+
+        if (this.vy < 0 || this.flameIndex !== 0) {
+            const fx = this.flameIndex * frameW;
+            ctx.drawImage(
+                this.sprite,
+                fx, 0, frameW, frameH,
+                this.x - this.width/2 - 6, this.y - this.height/2 + 10,
+                this.width * 0.9, this.height * 0.9
+            );
+        }
+    } else {
+        ctx.fillStyle = "#FFD700";
+        ctx.fillRec
     }
 
     getBounds() {
@@ -547,9 +577,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // arrancar desde tu botón "Play"
     const btnPlay = document.getElementById('btn-play');
     btnPlay?.addEventListener('click', () => {
-        document.getElementById('pantalla-juego')?.style.display = 'none';
-        document.getElementById('pantalla-juego-principal')?.style.display = 'none';
-        document.getElementById('juego-pantalla')?.style.display = 'flex';
+        const pj = document.getElementById('pantalla-juego');
+        if (pj) pj.style.display = 'none';
+        const pjp = document.getElementById('pantalla-juego-principal');
+        if (pjp) pjp.style.display = 'none';
+
+        const jp = document.getElementById('juego-pantalla');
+        if (jp) jp.style.display = 'flex';
         currentGame.start();
     });
 });
