@@ -112,13 +112,16 @@
 
         <div id="juego-pantalla" class="juegop"> 
 
-            <div class="contenedor-canvas">
-                <p id="timer" style="font-weight:bold; color:white; margin-bottom:10px;">⏱️ Tiempo: 0s</p>
+            <div class="contenedor-canvas" style="position: relative; width: 1200px; margin: 0 auto;">
                 <canvas id="canvas" width="400" height="400"></canvas>
-                <div class="contenedor-opciones">
+                <div id="menu-pausa" class="contenedor-opciones" style="position: absolute; display: none; font-size: 24px; padding: 10px 20px; z-index:10;">
+                    <button id="continuar">Continuar</button>
                     <button id="reiniciar">Reiniciar</button>
                     <button id="salir">Salir</button>
                 </div>
+                <button id="btn-pause" 
+            style="position: absolute; top: 20px; right: 20px; width: 60px; height: 60px; font-size: 18px; z-index:10; border-radius: 50%; display: flex;
+            justify-content: center; align-items: center; cursor: pointer;">⏸</button>
             </div>
 
         </div>   

@@ -134,7 +134,7 @@ class GameAssets {
             bg_far: "https://i.postimg.cc/fTnR2R3V/bg-far.jpg",       // capa 4 (más lejos)
             bg_mid2: "https://i.postimg.cc/Fs5HWHfj/bg-mid3.png",     // capa 3
             bg_mid1: "https://i.postimg.cc/pXbLGL9p/bg-mid2.png",     // capa 2
-            bg_front: "https://i.postimg.cc/fTnR2R3V/bg-far.jpg",   // capa 1 (más cerca)
+            bg_front: "https://i.postimg.cc/RNsW-5Byg/Generated-Image-November-16-2025-9-22PM-removebg-preview.png",   // capa 1 (más cerca)
             ship_sprites: "https://i.postimg.cc/qMVvbvtt/ship-sprites.png", ship_activate_sprites: "https://i.postimg.cc/w1y5MRTk/descarga.png", // sprite: flame frames + ship
             explosion_sprites: "https://i.postimg.cc/R6gc3S7n/cc572ebb-fb41-4e70-aeff-e309b344893d-removebg-preview.png",
             enemy_sprite: "https://i.postimg.cc/pmbrQmBN/descarga-(1).png",
@@ -142,6 +142,7 @@ class GameAssets {
             bonus_sprite: "https://i.postimg.cc/3kPs078r/bonus-sprite-removebg-preview.png"
         };
     }
+
     preloadImage(key, url) {
         return new Promise((resolve, reject) => {
             const img = new Image();
@@ -158,47 +159,88 @@ class GameAssets {
 }
 
 /* --------- Parallax Layer --------- */
+// class ParallaxLayer {
+//     constructor(img, speed) {
+//         this.img = img;
+//         this.speed = speed;
+//         this.x = 0;
+//     }
+
+//     update(dt) {
+//     this.x -= this.speed * dt;
+
+//     // loop infinito
+//     if (this.img) {
+//         const w = this.img.width;
+//         if (this.x <= -w) this.x += w;
+//         if (this.x >= w) this.x -= w;
+//     }
+//     }
+
+
+//         draw(ctx, canvas) {
+//         if (!this.img) {
+//             // fondo de respaldo
+//             ctx.fillStyle = "#87CEEB";
+//             ctx.fillRect(0, 0, canvas.width, canvas.height);
+//             return;
+//         }
+
+//         const w = this.img.width;
+//         let startX = Math.floor(this.x);
+
+//         // dibujar suficientes veces para cubrir pantalla
+//         for (let sx = startX; sx < canvas.width; sx += w) {
+//             ctx.drawImage(this.img, sx, 0, w, canvas.height);
+//         }
+
+//         // también una imagen a la izquierda por si queda espacio
+//         for (let sx = startX - w; sx > -w; sx -= w) {
+//             ctx.drawImage(this.img, sx, 0, w, canvas.height);
+//         }
+//     }
+
+
+// }
+
 class ParallaxLayer {
-    constructor(img, speed) {
+    constructor(img, speed, width=null, height=null) {
         this.img = img;
         this.speed = speed;
         this.x = 0;
+        this.width = width;   // si null, usa ancho natural
+        this.height = height; // si null, usa alto del canvas
     }
-    update(dt, playerSpeed) {
-        // avanza relativo al jugador
-        this.x -= this.speed * playerSpeed * dt;
-        // loop
+
+    update(dt) {
+        this.x -= this.speed * dt;
         if (this.img) {
-            const w = this.img.width;
+            const w = this.width ?? this.img.width;
             if (this.x <= -w) this.x += w;
             if (this.x >= w) this.x -= w;
         }
     }
 
-        draw(ctx, canvas) {
+    draw(ctx, canvas) {
         if (!this.img) {
-            // fondo de respaldo
             ctx.fillStyle = "#87CEEB";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             return;
         }
 
-        const w = this.img.width;
+        const w = this.width ?? this.img.width;
+        const h = this.height ?? canvas.height;
         let startX = Math.floor(this.x);
 
-        // dibujar suficientes veces para cubrir pantalla
         for (let sx = startX; sx < canvas.width; sx += w) {
-            ctx.drawImage(this.img, sx, 0, w, canvas.height);
+            ctx.drawImage(this.img, sx, 0, w, h);
         }
-
-        // también una imagen a la izquierda por si queda espacio
         for (let sx = startX - w; sx > -w; sx -= w) {
-            ctx.drawImage(this.img, sx, 0, w, canvas.height);
+            ctx.drawImage(this.img, sx, 0, w, h);
         }
     }
-
-
 }
+
 
 /* --------- Ship (jugador) --------- */
 class Ship {
@@ -208,8 +250,8 @@ class Ship {
         this.x = 120;
         this.y = 200;
         this.vy = 0;
-        this.width = 60; // 64
-        this.height = 60; //48
+        this.width = 80; // 64
+        this.height = 80; //48
         this.gravity = 1200; // px/s^2
         this.flapStrength = -350; // impulso
         this.maxFallSpeed = 800;
@@ -410,7 +452,7 @@ class ObstacleManager {
 
     _spawnPair() {
     const pipeW = 72;
-    const gap = 140;              
+    const gap = 170;              
     const minH = 120;                
     const maxH = this.canvas.height - gap - 200;
 
@@ -593,6 +635,7 @@ class SpaceGame {
 
 
     _setupWorld() {
+
     // dimensionar canvas
     const ratio = window.devicePixelRatio || 1;
     const w = 800;
@@ -603,13 +646,13 @@ class SpaceGame {
     this.canvas.height = Math.floor(h * ratio);
     this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-    // parallax 4 capas (más lejos -> más lento)
     this.layers = [
-        new ParallaxLayer(this.assets.images.bg_front, 200),
-        new ParallaxLayer(this.assets.images.bg_mid1, 120),
-        new ParallaxLayer(this.assets.images.bg_mid2, 60),
-        new ParallaxLayer(this.assets.images.bg_far, 30),    // px/s
+    new ParallaxLayer(this.assets.images.bg_far,   30, 800, 480),
+    new ParallaxLayer(this.assets.images.bg_mid2,  60, 600, 400),
+    new ParallaxLayer(this.assets.images.bg_mid1,  80, 1200, 600),
+    new ParallaxLayer(this.assets.images.bg_front,200, 400, 240)
     ];
+
 
     // nubes independientes
     this.clouds = [];
@@ -626,10 +669,11 @@ class SpaceGame {
     this.ship = new Ship(this.assets.images.ship_sprites, this.assets.images.ship_activate_sprites);
     this.obManager = new ObstacleManager(this.canvas, this.assets);
 
+
     // UI
     if (this.scoreEl) this.scoreEl.textContent = `Score: 0`;
     if (this.livesEl) this.livesEl.textContent = `Lives: ${this.ship.lives}`;
-}
+    }
 
 
     _loop(ts) {
@@ -661,7 +705,8 @@ class SpaceGame {
         }
 
         const playerSpeed = 1; // factor
-        this.layers.forEach(l => l.update(dt, playerSpeed));
+        // this.layers.forEach(l => l.update(dt, playerSpeed));
+        this.layers.forEach(l => l.update(dt));
         this.ship.update(dt);
         this.obManager.update(dt);
 

@@ -1,6 +1,65 @@
-// ---------- Reemplazo: Juego de Nave (Flappy + Shooter) ----------
+// ------------------- Pantallas y botones (igual que antes) -------------------
+const btnPlay = document.getElementById('btn-play');
+const pantallaJuegoInactivo = document.getElementById('pantalla-juego');
+const pantallaJuegoActivo = document.getElementById('pantalla-juego-principal');
 
-/* --------- Assets --------- */
+btnPlay && btnPlay.addEventListener('click', () => {
+    pantallaJuegoInactivo.style.display = 'none';
+    pantallaJuegoActivo.style.display = 'flex';
+});
+
+const btnJugarSolo = document.getElementById('solo');
+const btnMultijugador = document.getElementById('multijugador');
+const btnInstrucciones = document.getElementById('instrucciones');
+const pantallaMultijugador = document.getElementById('pantalla-multijugador');
+const pantallaInstrucciones = document.getElementById('pantalla-instrucciones');
+const pantallaElegirPj = document.getElementById('solitario-piezas');
+const pantallaJuego = document.getElementById('juego-pantalla');
+const btnSalir = document.getElementById('salir');
+
+btnInstrucciones && btnInstrucciones.addEventListener('click', () => {
+    pantallaJuegoActivo.style.display = 'none';
+    pantallaInstrucciones.style.display = 'flex';
+});
+const volverInstrucciones = document.getElementById('volver-instrucciones');
+volverInstrucciones && volverInstrucciones.addEventListener('click', () => {
+    pantallaJuegoActivo.style.display = 'flex';
+    pantallaInstrucciones.style.display = 'none';
+});
+
+btnMultijugador && btnMultijugador.addEventListener('click', () => {
+    pantallaJuegoActivo.style.display = 'none';
+    pantallaMultijugador.style.display = 'flex';
+});
+const volverMultijugador = document.getElementById('volver-multijugador');
+volverMultijugador && volverMultijugador.addEventListener('click', () => {
+    pantallaJuegoActivo.style.display = 'flex';
+    pantallaMultijugador.style.display = 'none';
+});
+
+btnJugarSolo && btnJugarSolo.addEventListener('click', () => {
+    pantallaJuegoActivo.style.display = 'none';
+    pantallaJuego.style.display = 'flex';
+});
+
+btnSalir && btnSalir.addEventListener('click', () => {
+    pantallaJuego.style.display = 'none';
+    pantallaJuegoActivo.style.display = 'flex';
+    clearInterval(timerInterval);
+    timerEl.textContent = "⏱️ Tiempo: 120s";
+});
+
+const btnPause = document.getElementById('btn-pause');
+btnPause.addEventListener('click', () => {
+    currentGame._togglePause();
+});
+
+const quitarPausa = document.getElementById('continuar');
+quitarPausa.addEventListener('click', () => {
+    currentGame._togglePause();
+});
+
+
 class GameAssets {
     constructor() {
         this.images = {};
@@ -8,15 +67,15 @@ class GameAssets {
             bg_far: "https://i.postimg.cc/fTnR2R3V/bg-far.jpg",       // capa 4 (más lejos)
             bg_mid2: "https://i.postimg.cc/Fs5HWHfj/bg-mid3.png",     // capa 3
             bg_mid1: "https://i.postimg.cc/pXbLGL9p/bg-mid2.png",     // capa 2
-            bg_front: "https://i.postimg.cc/p9LPXsyT/Whats-App-Image-2025-11-16-at-15-20-40-f3d25315.jpg",   // capa 1 (más cerca)
-            ship_sprites: "https://i.postimg.cc/qMVvbvtt/ship-sprites.png", // sprite: flame frames + ship
-            ship_activate_spite: "https://i.postimg.cc/gnVV9bjp/Generated-Image-November-16-2025-4-18PM.png",
-            explosion_sprites: "https://i.postimg.cc/qz4STzNJ/Generated-Image-November-16-2025-3-22PM.png",
-            enemy_sprite: "https://i.postimg.cc/8s04ycLY/Generated-Image-November-16-2025-3-25PM.png",
-            cloud_sprite: "https://i.postimg.cc/ppQ9m1VV/Generated-Image-November-16-2025-3-28PM.png",
-            bonus_sprite: "https://i.postimg.cc/YLrSYtC8/Generated-Image-November-16-2025-3-31PM.png"
+            bg_front: "https://i.postimg.cc/RNsW-5Byg/Generated-Image-November-16-2025-9-22PM-removebg-preview.png",   // capa 1 (más cerca)
+            ship_sprites: "https://i.postimg.cc/qMVvbvtt/ship-sprites.png", ship_activate_sprites: "https://i.postimg.cc/w1y5MRTk/descarga.png", // sprite: flame frames + ship
+            explosion_sprites: "https://i.postimg.cc/R6gc3S7n/cc572ebb-fb41-4e70-aeff-e309b344893d-removebg-preview.png",
+            enemy_sprite: "https://i.postimg.cc/pmbrQmBN/descarga-(1).png",
+            cloud_sprite: "https://i.postimg.cc/p5thWkLh/Generated-Image-November-16-2025-7-51PM-removebg-preview.png",
+            bonus_sprite: "https://i.postimg.cc/3kPs078r/bonus-sprite-removebg-preview.png"
         };
     }
+
     preloadImage(key, url) {
         return new Promise((resolve, reject) => {
             const img = new Image();
@@ -33,61 +92,65 @@ class GameAssets {
 }
 
 /* --------- Parallax Layer --------- */
+
 class ParallaxLayer {
-    constructor(img, speed) {
+    constructor(img, speed, width=null, height=null) {
         this.img = img;
         this.speed = speed;
         this.x = 0;
+        this.width = width;   // si null, usa ancho natural
+        this.height = height; // si null, usa alto del canvas
     }
-    update(dt, playerSpeed) {
-        // avanza relativo al jugador
-        this.x -= this.speed * playerSpeed * dt;
-        // loop
+
+    update(dt) {
+        this.x -= this.speed * dt;
         if (this.img) {
-            const w = this.img.width;
+            const w = this.width ?? this.img.width;
             if (this.x <= -w) this.x += w;
             if (this.x >= w) this.x -= w;
         }
     }
+
     draw(ctx, canvas) {
         if (!this.img) {
-            // fondo de respaldo
             ctx.fillStyle = "#87CEEB";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             return;
         }
-        const w = this.img.width;
+
+        const w = this.width ?? this.img.width;
+        const h = this.height ?? canvas.height;
         let startX = Math.floor(this.x);
-        // dibujar suficientes veces para cubrir pantalla
+
         for (let sx = startX; sx < canvas.width; sx += w) {
-            ctx.drawImage(this.img, sx, 0, w, canvas.height);
+            ctx.drawImage(this.img, sx, 0, w, h);
         }
-        // también una imagen a la izquierda por si queda espacio
         for (let sx = startX - w; sx > -w; sx -= w) {
-            ctx.drawImage(this.img, sx, 0, w, canvas.height);
+            ctx.drawImage(this.img, sx, 0, w, h);
         }
     }
 }
 
+
 /* --------- Ship (jugador) --------- */
 class Ship {
-    constructor(imgSprites, imgActivateSprite) {
+    constructor(imgSprites, activateSprites) {
         this.sprite = imgSprites; // spritesheet
-        this.activate_spite = imgActivateSprite
+        this.activateSprites = activateSprites
         this.x = 120;
         this.y = 200;
         this.vy = 0;
-        this.width = 64;
-        this.height = 48;
+        this.width = 100; // 64
+        this.height = 100; //48
         this.gravity = 1200; // px/s^2
-        this.flapStrength = -420; // impulso
+        this.flapStrength = -350; // impulso
         this.maxFallSpeed = 800;
         this.alive = true;
         this.lives = 3;
         this.score = 0;
 
         // animación de propulsores (supongamos 4 frames horizontales)
-        this.flameFrames = 4;
+        this.flameFrames = 1;
         this.flameFrameTime = 0.06;
         this.flameTimer = 0;
         this.flameIndex = 0;
@@ -95,6 +158,31 @@ class Ship {
         // explosión state
         this.exploding = false;
         this.explosionTimer = 0;
+
+        // efecto rojo
+        this.redSprite = null; // versión de la nave en rojo
+        this.damageTimer = 0;
+        this.damageDuration = 0.1;
+
+        this._prepareRedSprite(); // precalcular versión roja
+    }
+
+    _prepareRedSprite() {
+        const temp = document.createElement('canvas');
+        temp.width = this.width;
+        temp.height = this.height;
+        const tctx = temp.getContext('2d');
+
+        // dibujar sprite original escalado
+        tctx.drawImage(this.sprite, 0, 0, this.width, this.height);
+
+        // aplicar rojo sobre los píxeles visibles
+        tctx.fillStyle = 'red';
+        tctx.globalCompositeOperation = 'source-in';
+        tctx.fillRect(0, 0, this.width, this.height);
+
+        this.redSprite = new Image();
+        this.redSprite.src = temp.toDataURL();
     }
 
     flap() {
@@ -112,8 +200,24 @@ class Ship {
         if (this.vy > this.maxFallSpeed) this.vy = this.maxFallSpeed;
         this.y += this.vy * dt;
 
-        // límites pantalla
-        if (this.y < 10) { this.y = 10; this.vy = 0; }
+        // reducir timer de daño
+        if (this.damageTimer > 0) this.damageTimer -= dt;
+
+        // Limite superior
+        if (this.y < 10) { 
+            this.y = 10; 
+            this.vy = 0; 
+        }
+
+        // Limite inferior
+        const canvasHeight = 600; // o pasalo como parámetro si querés más dinámico
+        if (this.y + this.height/2 > canvasHeight) { 
+            this.y = canvasHeight - this.height/2; 
+            // this.vy = 0; 
+            this.vy = -700;                           // empuja hacia arriba
+            this.hit();   
+        }
+
         // anim flame
         this.flameTimer += dt;
         if (this.flameTimer >= this.flameFrameTime) {
@@ -123,57 +227,38 @@ class Ship {
     }
 
     draw(ctx) {
-        if (this.exploding) {
-            // no dibujar nave, explosion manejada por Game.explosionDraw
-            return;
-        }
-        if (this.sprite) {
-            // suponemos: sprite ancho = (flameFrames + 1) * frameW
-            const frameW = this.sprite.width / (this.flameFrames + 1);
-            const frameH = this.sprite.height;
-            // dibujar nave (último frame)
-            const shipFrameIndex = this.flameFrames; // último frame es la nave quieta
-            ctx.drawImage(this.sprite, shipFrameIndex * frameW, 0, frameW, frameH,
-                          this.x - this.width/2, this.y - this.height/2, this.width, this.height);
-            // dibujar flame debajo si está flap (si vy < 0 o se acaba de flapear)
+        if (this.exploding) return;
+
+        if (this.damageTimer > 0) {
+            // canvas temporal
+            const temp = document.createElement('canvas');
+            temp.width = this.width;
+            temp.height = this.height;
+            const tctx = temp.getContext('2d');
+
+            // dibujar nave normal
+            tctx.drawImage(this.sprite, 0, 0, this.width, this.height);
+
+            // dibujar flame si corresponde
             if (this.vy < 0 || this.flameIndex !== 0) {
-                const fx = this.flameIndex * frameW;
-                ctx.drawImage(this.activate_spite, fx, 0, frameW, frameH,
-                              this.x - this.width/2 - 6, this.y - this.height/2 + 10, this.width * 0.9, this.height * 0.9);
+                tctx.drawImage(this.activateSprites, 0, 0, this.width, this.height);
             }
+
+            // aplicar rojo solo a los píxeles visibles
+            tctx.fillStyle = 'red';
+            tctx.globalAlpha = 0.6;
+            tctx.globalCompositeOperation = 'source-in';
+            tctx.fillRect(0, 0, this.width, this.height);
+
+            // dibujar en canvas principal
+            ctx.drawImage(temp, this.x - this.width/2, this.y - this.height/2);
         } else {
-            // fallback: rectángulo
-            ctx.fillStyle = "#FFD700";
-            ctx.fillRect(this.x - this.width/2, this.y - this.height/2, this.width, this.height);
+            // dibujar normal
+            ctx.drawImage(this.sprite, this.x - this.width/2, this.y - this.height/2, this.width, this.height);
+            if (this.vy < 0 || this.flameIndex !== 0) {
+                ctx.drawImage(this.activateSprites, this.x - this.width/2, this.y - this.height/2, this.width, this.height);
+            }
         }
-    }
-
-    draw(ctx) {
-    if (this.exploding) return;
-
-    if (this.sprite) {
-        const frameW = this.sprite.width / (this.flameFrames + 1);
-        const frameH = this.sprite.height;
-        const shipFrameIndex = this.flameFrames;
-        ctx.drawImage(
-            this.sprite,
-            shipFrameIndex * frameW, 0, frameW, frameH,
-            this.x - this.width/2, this.y - this.height/2,
-            this.width, this.height
-        );
-
-        if (this.vy < 0 || this.flameIndex !== 0) {
-            const fx = this.flameIndex * frameW;
-            ctx.drawImage(
-                this.sprite,
-                fx, 0, frameW, frameH,
-                this.x - this.width/2 - 6, this.y - this.height/2 + 10,
-                this.width * 0.9, this.height * 0.9
-            );
-        }
-    } else {
-        ctx.fillStyle = "#FFD700";
-        ctx.fillRec
     }
 
     getBounds() {
@@ -182,6 +267,7 @@ class Ship {
 
     hit() {
         this.lives--;
+        this.damageTimer = this.damageDuration; // activar efecto rojo
         if (this.lives <= 0) {
             this.alive = false;
             this.exploding = true;
@@ -255,26 +341,41 @@ class ObstacleManager {
     }
 
     _spawnPair() {
-        const gap = 140; // gap vertical
-        const minH = 60;
-        const maxH = this.canvas.height - gap - 120;
-        const topH = minH + Math.random() * (maxH - minH);
         const pipeW = 72;
-        // top pipe
-        this.obstacles.push(new Obstacle(this.canvas.width + 40, 0, pipeW, topH, "pipe"));
-        // bottom pipe
-        this.obstacles.push(new Obstacle(this.canvas.width + 40, topH + gap, pipeW, this.canvas.height - (topH + gap), "pipe"));
-        // small chance spawn enemy
+        const gap = 200;              
+        const minH = 120;                
+        const maxH = this.canvas.height - gap - 300;
+
+        // Generar topH con variación
+        const prevY = this.lastY ?? (this.canvas.height / 2);
+        const maxDesvio = 60;
+        let topH = prevY + (Math.random() * 2 - 1) * maxDesvio;
+        topH = Math.max(minH, Math.min(maxH, topH));
+        this.lastY = topH;
+
+        const xPos = this.canvas.width + 80;
+
+        // crear tubos
+        this.obstacles.push(new Obstacle(xPos, 0, pipeW, topH, "pipe"));
+        this.obstacles.push(new Obstacle(xPos, topH + gap, pipeW, this.canvas.height - (topH + gap), "pipe"));
+
+        // margen dentro del gap para enemigos
         if (Math.random() < 0.3) {
-            const ey = 40 + Math.random() * (this.canvas.height - 80);
-            this.obstacles.push(new Obstacle(this.canvas.width + 120, ey, 48, 36, "enemy"));
+            const enemySize = 100; // tamaño del enemigo
+            const safeTop = topH + 10;                  // margen superior
+            const safeBottom = topH + gap - enemySize - 10; // margen inferior considerando tamaño del enemy
+
+            const ey = safeTop + Math.random() * (safeBottom - safeTop);
+            this.obstacles.push(new Obstacle(this.canvas.width + 120, ey, enemySize, enemySize, "enemy"));
         }
-        // small chance bonus
+
+        // bonus centrado en la abertura
         if (Math.random() < 0.2) {
-            const by = 40 + Math.random() * (this.canvas.height - 80);
+            const by = topH + gap / 2 - 18; 
             this.obstacles.push(new Obstacle(this.canvas.width + 200, by, 36, 36, "bonus"));
         }
     }
+
 
     draw(ctx) {
         for (const o of this.obstacles) o.draw(ctx, this.assets);
@@ -308,6 +409,47 @@ class ObstacleManager {
 }
 
 /* --------- Game principal --------- */
+
+/* --------- Temporizador del juego --------- */
+class GameTimer {
+    constructor(domElement, duration, onFinish) {
+        this.domElement = domElement;     // elemento donde se muestra el tiempo
+        this.duration = duration;         // duración total en segundos
+        this.remaining = duration;        // tiempo restante
+        this.onFinish = onFinish;         // callback cuando termina
+        this.interval = null;
+    }
+
+    start() {
+        this.stop(); // por si había uno corriendo
+        this.remaining = this.duration;
+
+        this.interval = setInterval(() => {
+            this.remaining--;
+            if (this.domElement) {
+                this.domElement.textContent = this.remaining + "s";
+            }
+            if (this.remaining <= 0) {
+                this.stop();
+                if (this.onFinish) this.onFinish();
+            }
+        }, 1000);
+    }
+
+    stop() {
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
+    }
+
+    getRemaining() {
+        return this.remaining;
+    }
+}
+
+
+
 class SpaceGame {
     constructor() {
         // referencias UI (las tuyas ya existentes)
@@ -318,9 +460,12 @@ class SpaceGame {
         this.pantallaMenu = document.getElementById('pantalla-juego-principal');
         this.btnReiniciar = document.getElementById('reiniciar');
         this.btnSalir = document.getElementById('salir');
+        document.getElementById('menu-pausa').style.display = 'none'
 
         // botón disparo (puede estar en HTML)
         this.btnShoot = document.getElementById('btn-shoot');
+        this.shots = []; // x, y, timer
+        this.shotSpeed = 600; 
 
         this.assets = new GameAssets();
         this.layers = [];
@@ -337,6 +482,20 @@ class SpaceGame {
 
         // tiempo (si querés mantener GameTimer)
         this.gameTimer = new GameTimer(this.timerEl, 120, this.onTimeUp.bind(this));
+
+        // sonidos
+        this.shootSound = new Audio('https://www.myinstants.com/media/sounds/laser.mp3');
+        this.shootSound.volume = 0.3;
+        this.explosionSound = new Audio('https://www.myinstants.com/media/sounds/explosion.mp3'); 
+        this.explosionSound.volume = 0.3;
+        this.bonusSound = new Audio('https://www.myinstants.com/media/sounds/coin.mp3'); // bonus recogido
+        this.bonusSound.volume = 0.4;
+
+        this.enemyDestroySound = new Audio('https://www.myinstants.com/media/sounds/explosion.mp3'); // enemigo destruido
+        this.enemyDestroySound.volume = 0.2;
+
+        this.hitSound = new Audio('https://drive.google.com/file/d/1BpUowYAhvFGkXAxW1rVTG4f3z2JlcKct/edit'); // daño al chocar
+        this.hitSound.volume = 0.4;
 
         this._bindUI();
         this._bindInput();
@@ -358,13 +517,34 @@ class SpaceGame {
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') { e.preventDefault(); this._flap(); }
             if (e.code === 'KeyF') this._shoot();
+            if (e.code === 'Escape') {        // <--- nueva línea
+                e.preventDefault();
+                this._togglePause();
+            }
         });
         // click / touch to flap
         this.canvas.addEventListener('mousedown', (e) => { this._flap(); });
         this.canvas.addEventListener('touchstart', (e) => { this._flap(); });
     }
 
+    _stopAllSounds() {
+        const sounds = [
+            this.shootSound,
+            this.explosionSound,
+            this.bonusSound,
+            this.enemyDestroySound,
+            this.hitSound
+        ];
+
+        sounds.forEach(s => {
+            s.pause();
+            s.currentTime = 0; // reinicia para que no siga sonando
+        });
+    }
+
     async start() {
+        document.getElementById('menu-pausa').style.display = 'none';
+        this._explosionPlayed = false; // resetear para nueva partida
         await this.assets.preloadAll();
         this._setupWorld();
         this.gameTimer.start();
@@ -373,136 +553,218 @@ class SpaceGame {
         requestAnimationFrame(this._loop.bind(this));
     }
 
+    _togglePause() {
+    this.running = !this.running;
+    if (!this.running) {
+        // mostrar botones de reiniciar y salir
+        document.getElementById('menu-pausa').style.display = 'flex'
+    } else {
+        // ocultar botones
+        document.getElementById('menu-pausa').style.display = 'none'
+        // reinicia loop
+        this.lastTime = performance.now();
+        requestAnimationFrame(this._loop.bind(this));
+    }
+    }
+
+
     stop() {
         this.running = false;
         this.gameTimer.stop();
     }
 
+
     _setupWorld() {
-        // dimensionar canvas
-        const ratio = window.devicePixelRatio || 1;
-        const w = 800;
-        const h = 480;
-        this.canvas.style.width = w + "px";
-        this.canvas.style.height = h + "px";
-        this.canvas.width = Math.floor(w * ratio);
-        this.canvas.height = Math.floor(h * ratio);
-        this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-        // parallax 4 capas (más lejos -> más lento)
-        this.layers = [
-            new ParallaxLayer(this.assets.images.bg_far, 0.15),
-            new ParallaxLayer(this.assets.images.bg_mid2, 0.4),
-            new ParallaxLayer(this.assets.images.bg_mid1, 0.75),
-            new ParallaxLayer(this.assets.images.bg_front, 1.2)
-        ];
+    // dimensionar canvas
+    const ratio = window.devicePixelRatio || 1;
+    const w = 1200;
+    const h = 600;
+    this.canvas.style.width = w + "px";
+    this.canvas.style.height = h + "px";
+    this.canvas.width = Math.floor(w * ratio);
+    this.canvas.height = Math.floor(h * ratio);
+    this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-        this.ship = new Ship(this.assets.images.ship_sprites);
-        this.obManager = new ObstacleManager(this.canvas, this.assets);
+    this.layers = [
+    new ParallaxLayer(this.assets.images.bg_far,   30, 1200, 600),
+    new ParallaxLayer(this.assets.images.bg_mid2,  60, 600, 600),
+    new ParallaxLayer(this.assets.images.bg_mid1,  80, 1200, 600),
+    // new ParallaxLayer(this.assets.images.bg_front,200, 400, 600)
+    ];
 
-        // UI
-        if (this.scoreEl) this.scoreEl.textContent = `Score: 0`;
-        if (this.livesEl) this.livesEl.textContent = `Lives: ${this.ship.lives}`;
+
+    // nubes independientes
+    this.clouds = [];
+    for (let i = 0; i < 5; i++) {
+        this.clouds.push({
+            x: Math.random() * this.canvas.width,
+            y: 40 + Math.random() * 200,
+            w: 200,
+            h: 200,
+            speed: 40 + Math.random() * 60
+        });
+    }
+
+    this.ship = new Ship(this.assets.images.ship_sprites, this.assets.images.ship_activate_sprites);
+    this.obManager = new ObstacleManager(this.canvas, this.assets);
+
+
+    // UI
+    if (this.scoreEl) this.scoreEl.textContent = `Score: 0`;
+    if (this.livesEl) this.livesEl.textContent = `Lives: ${this.ship.lives}`;
     }
 
     _loop(ts) {
-        if (!this.running) return;
-        const dt = Math.min((ts - this.lastTime) / 1000, 0.05);
-        this.lastTime = ts;
+    if (!this.running) return;
+    const dt = Math.min((ts - this.lastTime) / 1000, 0.05);
+    this.lastTime = ts;
 
-        // update world
-        const playerSpeed = 1; // factor
-        this.layers.forEach(l => l.update(dt, playerSpeed));
-        this.ship.update(dt);
-        this.obManager.update(dt);
+    // si la nave está explotando, detenemos el timer
+    if (this.ship.exploding && this.gameTimer.interval !== null) {
+        this.gameTimer.stop();
+    }
 
-        // colisiones
-        const hitObs = this.obManager.checkCollisions(this.ship);
-        if (hitObs) {
-            if (hitObs.type === "bonus") {
-                hitObs.dead = true;
-                this.ship.score += 10;
-            } else {
-                // daño
-                hitObs.dead = true;
-                this.ship.hit();
-            }
-            this._updateUI();
-        }
+    for (let i = this.shots.length - 1; i >= 0; i--) {
+    const s = this.shots[i];
+        s.x += this.shotSpeed * dt;
+        // colisiones con enemigos
+        for (let j = 0; j < this.obManager.obstacles.length; j++) {
+            const o = this.obManager.obstacles[j];
+            const b = o.getBounds();
+            if (!o.dead && o.type === "enemy" &&
+                s.x + s.w > b.x && s.x < b.x + b.w &&
+                s.y + s.h/2 > b.y && s.y - s.h/2 < b.y + b.h) {
+                
+                o.dead = true;
+                this.ship.score += 2;
 
-        // update puntuación por pasar obstáculos (simple heuristic)
-        for (const o of this.obManager.obstacles) {
-            if (!o._scored && o.x + o.w < this.ship.x) {
-                o._scored = true;
-                if (o.type === "pipe") this.ship.score += 1;
+                // sonido de enemigo destruido
+                this.enemyDestroySound.currentTime = 0;
+                this.enemyDestroySound.play();
             }
         }
+        if (s.x > this.canvas.width) this.shots.splice(i, 1);
+    }
 
-        // limpiar explosion y terminar si muerto
-        if (this.ship.exploding) {
-            this.ship.explosionTimer += dt;
-            if (this.ship.explosionTimer > 1.2) {
-                // Game over
-                this.running = false;
-                this._gameOver();
-                return;
+
+    // actualizar mundo
+    this.layers.forEach(l => l.update(dt));
+    this.ship.update(dt);
+    this.obManager.update(dt);
+
+    const hitObs = this.obManager.checkCollisions(this.ship);
+    if (hitObs && !this.ship.exploding) {
+        if (hitObs.type === "bonus") {
+            hitObs.dead = true;
+            this.ship.score += 10;
+            this.bonusSound.currentTime = 0;
+            this.bonusSound.play();
+        } else {
+            hitObs.dead = true;
+            this.ship.hit();
+            this.hitSound.currentTime = 0;
+            this.hitSound.play();
+
+            if (!this.ship.alive) {  // justo murió
+                this.gameTimer.stop(); 
             }
         }
+        this._updateUI();
+    }
 
-        // draw
-        this._draw();
 
-        // win/lose timeouts
-        if (this.gameTimer.getRemaining() <= 0) {
-            this.running = false;
+    // puntuación
+    for (const o of this.obManager.obstacles) {
+        if (!o._scored && o.x + o.w < this.ship.x) {
+            o._scored = true;
+            if (o.type === "pipe") this.ship.score += 1;
+        }
+    }
+
+    // animación explosión
+    if (this.ship.exploding) {
+
+        if (!this._explosionPlayed) {
+        this.explosionSound.currentTime = 0;
+        this.explosionSound.play();
+        this._explosionPlayed = true;
+        }
+
+        this.ship.explosionTimer += dt;
+        if (this.ship.explosionTimer > 1.2) {
             this._gameOver();
             return;
         }
-
-        requestAnimationFrame(this._loop.bind(this));
     }
+
+    this._draw();
+
+    if (this.gameTimer.getRemaining() <= 0 && this.running) {
+        this.running = false;
+        this._gameOver();
+        return;
+    }
+
+    requestAnimationFrame(this._loop.bind(this));
+}
+
 
     _draw() {
-        // limpiar
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    // limpiar
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // dibujar parallax
-        for (const l of this.layers) l.draw(this.ctx, this.canvas);
+    // dibujar todas las capas de fondo (parallax)
 
-        // dibujar obstáculos
-        this.obManager.draw(this.ctx);
+    for (const l of this.layers) l.draw(this.ctx, this.canvas);
 
-        // dibujar objetos animados extra (nubes)
-        const cloud = this.assets.images.cloud_sprite;
-        if (cloud) {
-            // mostrar algunas nubes
-            this.ctx.globalAlpha = 0.8;
-            this.ctx.drawImage(cloud, (this.layers[1].x % this.canvas.width + 200) % this.canvas.width, 40, 120, 48);
-            this.ctx.globalAlpha = 1;
-        }
+    // dibujar nubes difuminadas
+    const cloudImg = this.assets.images.cloud_sprite;
+    if (cloudImg) {
+        this.clouds.forEach(c => {
+            c.x -= c.speed * 0.016; // dt aproximado
+            if (c.x + c.w < 0) c.x = this.canvas.width;
 
-        // dibujar nave
-        this.ship.draw(this.ctx);
-
-        // dibujar explosion si corresponde
-        if (this.ship.exploding && this.assets.images.explosion_sprites) {
-            const exp = this.assets.images.explosion_sprites;
-            const frames = 6;
-            const t = this.ship.explosionTimer;
-            const idx = Math.floor((t / 1.2) * frames);
-            const fw = exp.width / frames;
-            const fh = exp.height;
-            this.ctx.drawImage(exp, Math.min(idx, frames-1) * fw, 0, fw, fh,
-                               this.ship.x - 48, this.ship.y - 48, 96, 96);
-        }
-
-        // HUD
-        this.ctx.fillStyle = "white";
-        this.ctx.font = "18px Arial";
-        this.ctx.fillText(`Score: ${this.ship.score}`, 18, 26);
-        this.ctx.fillText(`Lives: ${this.ship.lives}`, 18, 48);
-        this.ctx.fillText(`Time: ${this.gameTimer.getRemaining()}s`, 18, 70);
+            this.ctx.save();
+            this.ctx.globalAlpha = 0.5;      // semitransparente
+            this.ctx.filter = 'blur(2px)';   // difuminado
+            this.ctx.drawImage(cloudImg, c.x, c.y, c.w, c.h);
+            this.ctx.restore();
+        });
     }
+
+    // dibujar obstáculos
+    this.obManager.draw(this.ctx);
+
+    // dibujar nave
+    this.ship.draw(this.ctx);
+
+    // dibujar explosión si corresponde
+    if (this.ship.exploding && this.assets.images.explosion_sprites) {
+        const exp = this.assets.images.explosion_sprites;
+        const frames = 5;
+        const t = this.ship.explosionTimer;
+        const idx = Math.floor((t / 1.2) * frames);
+        const fw = exp.width / frames;
+        const fh = exp.height;
+        this.ctx.drawImage(exp, Math.min(idx, frames-1) * fw, 0, fw, fh,
+                           this.ship.x - 6, this.ship.y - 60, 100, 100);
+    }
+
+    // dibujar disparos
+    for (const s of this.shots) {
+        this.ctx.fillStyle = "yellow";
+        this.ctx.fillRect(s.x, s.y - s.h/2, s.w, s.h);
+    }
+
+    // HUD
+    this.ctx.fillStyle = "white";
+    this.ctx.font = "18px Arial";
+    this.ctx.fillText(`Score: ${this.ship.score}`, 18, 26);
+    this.ctx.fillText(`Lives: ${this.ship.lives}`, 18, 48);
+    this.ctx.fillText(`Time: ${this.gameTimer.getRemaining()}s`, 18, 70);
+}
+
 
     _flap() {
         if (!this.running) return;
@@ -510,17 +772,13 @@ class SpaceGame {
     }
 
     _shoot() {
-        if (!this.running) return;
-        // efecto visual rápido (línea) y llamar manager
-        const sx = this.ship.x + 30;
-        const sy = this.ship.y;
-        const success = this.obManager.shoot(sx, sy);
-        if (success) {
-            // sumar puntaje por destruir
-            this.ship.score += 2;
-            this._flashShot(sx, sy);
-            this._updateUI();
-        }
+    if (!this.running) return;
+    const sx = this.ship.x + 30;
+    const sy = this.ship.y;
+    this.shots.push({ x: sx, y: sy, w: 6, h: 2 }); // crear disparo
+    // reproducir sonido
+    this.shootSound.currentTime = 0; // reinicia si estaba reproduciéndose
+    this.shootSound.play();
     }
 
     _flashShot(x, y) {
@@ -542,12 +800,15 @@ class SpaceGame {
     }
 
     _gameOver() {
+        this._stopAllSounds();
         // parar timer
+        this.running = false;
         this.gameTimer.stop();
-        // mostrar pantalla perdida (reusar tus nodos de gan/lose si existen)
+        this._updateUI();   
+        
         const perdedor = document.getElementById('perdedor');
         const ganador = document.getElementById('ganador');
-        if (perdedor) {
+        if (this.ship.lives === 0) {
             const miDiv = document.getElementById('miDivPer');
             miDiv.innerHTML = `<p>Juego terminado. Puntaje: ${this.ship.score}</p>`;
             this.pantallaJuego.style.display = 'none';
@@ -557,8 +818,14 @@ class SpaceGame {
                 this.pantallaMenu.style.display = 'flex';
             });
         } else {
-            alert(`Juego terminado. Puntaje: ${this.ship.score}`);
-            this.pantallaMenu.style.display = 'flex';
+            const miDiv = document.getElementById('miDivGa');
+            miDiv.innerHTML = `<p>Ganaste! Puntaje: ${this.ship.score}</p>`;
+            this.pantallaJuego.style.display = 'none';
+            ganador.style.display = 'flex';
+            document.getElementById('btn-volver-ga')?.addEventListener('click', () => {
+                ganador.style.display = 'none';
+                this.pantallaMenu.style.display = 'flex';
+            });
         }
     }
 
@@ -576,7 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // arrancar desde tu botón "Play"
     const btnPlay = document.getElementById('btn-play');
-    btnPlay?.addEventListener('click', () => {
+    btnJugarSolo?.addEventListener('click', () => {
         const pj = document.getElementById('pantalla-juego');
         if (pj) pj.style.display = 'none';
         const pjp = document.getElementById('pantalla-juego-principal');
@@ -587,3 +854,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentGame.start();
     });
 });
+
+
+
