@@ -6,6 +6,12 @@ const pantallaJuegoActivo = document.getElementById('pantalla-juego-principal');
 btnPlay && btnPlay.addEventListener('click', () => {
     pantallaJuegoInactivo.style.display = 'none';
     pantallaJuegoActivo.style.display = 'flex';
+
+    if (currentGame.menuMusic.paused) {
+        currentGame.menuMusic.play().catch(() => {
+            console.log("Requiere interacción del usuario para reproducir música");
+        });
+    }
 });
 
 const btnJugarSolo = document.getElementById('solo');
@@ -20,26 +26,41 @@ const btnSalir = document.getElementById('salir');
 btnInstrucciones && btnInstrucciones.addEventListener('click', () => {
     pantallaJuegoActivo.style.display = 'none';
     pantallaInstrucciones.style.display = 'flex';
+    currentGame.optionMusic.pause();
+    currentGame.optionMusic.currentTime = 0;
+    currentGame.optionMusic.play();
 });
 const volverInstrucciones = document.getElementById('volver-instrucciones');
 volverInstrucciones && volverInstrucciones.addEventListener('click', () => {
     pantallaJuegoActivo.style.display = 'flex';
     pantallaInstrucciones.style.display = 'none';
+    currentGame.optionMusic.pause();
+    currentGame.optionMusic.currentTime = 0;
+    currentGame.optionMusic.play();
 });
 
 btnMultijugador && btnMultijugador.addEventListener('click', () => {
     pantallaJuegoActivo.style.display = 'none';
     pantallaMultijugador.style.display = 'flex';
+    currentGame.optionMusic.pause();
+    currentGame.optionMusic.currentTime = 0;
+    currentGame.optionMusic.play();
 });
 const volverMultijugador = document.getElementById('volver-multijugador');
 volverMultijugador && volverMultijugador.addEventListener('click', () => {
     pantallaJuegoActivo.style.display = 'flex';
     pantallaMultijugador.style.display = 'none';
+    currentGame.optionMusic.pause();
+    currentGame.optionMusic.currentTime = 0;
+    currentGame.optionMusic.play();
 });
 
 btnJugarSolo && btnJugarSolo.addEventListener('click', () => {
     pantallaJuegoActivo.style.display = 'none';
     pantallaJuego.style.display = 'flex';
+    currentGame.optionMusic.pause();
+    currentGame.optionMusic.currentTime = 0;
+    currentGame.optionMusic.play();
 });
 
 btnSalir && btnSalir.addEventListener('click', () => {
@@ -247,6 +268,9 @@ class Ship {
             }
 
             // aplicar rojo solo a los píxeles visibles
+            currentGame.hitSound.currentTime = 1;
+            currentGame.hitSound.play();
+
             tctx.fillStyle = 'red';
             tctx.globalAlpha = 0.6;
             tctx.globalCompositeOperation = 'source-in';
@@ -630,6 +654,7 @@ class SpaceGame {
         this.layers = [];
         this.ship = null;
         this.obManager = null;
+        this._explosionPlayed = false;
 
         // control
         this.lastTime = 0;
@@ -653,19 +678,50 @@ class SpaceGame {
         this.enemyDestroySound = new Audio('https://www.myinstants.com/media/sounds/explosion.mp3'); // enemigo destruido
         this.enemyDestroySound.volume = 0.2;
 
-        this.hitSound = new Audio('https://drive.google.com/file/d/1BpUowYAhvFGkXAxW1rVTG4f3z2JlcKct/edit'); // daño al chocar
+        this.hitSound = new Audio('/quinta-entrega/sounds/danio.mp3'); // daño al chocar
         this.hitSound.volume = 0.4;
+
+        // música
+        this.menuMusic = new Audio('/quinta-entrega/sounds/sonido-extraterrestre.mp3');
+        this.menuMusic.loop = true;
+        this.menuMusic.volume = 0.5;
+
+        this.gameMusic = new Audio('/quinta-entrega/sounds/musica-juego.mp3');
+        this.gameMusic.loop = true;
+        this.gameMusic.volume = 0.1;
+
+        this.optionMusic = new Audio('/quinta-entrega/sounds/boton-ui.mp3');
+        this.gameMusic.loop = true;
+        this.gameMusic.volume = 0.2;
 
         this._bindUI();
         this._bindInput();
     }
 
     _bindUI() {
-        this.btnReiniciar?.addEventListener('click', () => this.start());
+        this.btnReiniciar?.addEventListener('click', () => {
+            this.start()
+            this.optionMusic.pause();
+            this.optionMusic.currentTime = 0;
+            this.optionMusic.play();
+        });
         this.btnSalir?.addEventListener('click', () => {
             this.stop();
             this.pantallaJuego.style.display = 'none';
             this.pantallaMenu.style.display = 'flex';
+
+            if (this.menuMusic.paused) {
+                this.menuMusic.play().catch(() => {
+                    console.log("Requiere interacción del usuario para reproducir música");
+                });
+            }
+
+            this.gameMusic.pause();
+            this.gameMusic.currentTime = 0;
+
+            this.optionMusic.pause();
+            this.optionMusic.currentTime = 0;
+            this.optionMusic.play();
         });
         this.btnShoot?.addEventListener('click', () => {
             this._shoot();
@@ -692,20 +748,34 @@ class SpaceGame {
             this.explosionSound,
             this.bonusSound,
             this.enemyDestroySound,
-            this.hitSound
+            this.hitSound,
+            this.gameMusic,
+            // this.menuMusic
         ];
 
         sounds.forEach(s => {
             s.pause();
-            s.currentTime = 0; // reinicia para que no siga sonando
+            s.currentTime = 0;
         });
     }
 
     async start() {
         document.getElementById('menu-pausa').style.display = 'none';
-        this._explosionPlayed = false; // resetear para nueva partida
         await this.assets.preloadAll();
         this._setupWorld();
+
+        // detener música del menú y reproducir música del juego
+        this.menuMusic.pause();
+        this.menuMusic.currentTime = 0;
+        this.gameMusic.play();
+
+        this.ship.alive = true;
+        this._explosionPlayed = false;
+        this.explosionSound.pause();
+        this.explosionSound.currentTime = 0;
+        this.ship.lives = 3;
+        this.ship.explosionTimer = 0;
+
         this.gameTimer.start();
         this.running = true;
         this.lastTime = performance.now();
@@ -714,6 +784,9 @@ class SpaceGame {
 
     _togglePause() {
     this.running = !this.running;
+    this.optionMusic.pause();
+    this.optionMusic.currentTime = 0;
+    this.optionMusic.play();
     if (!this.running) {
         // mostrar botones de reiniciar y salir
         document.getElementById('menu-pausa').style.display = 'flex'
@@ -726,12 +799,10 @@ class SpaceGame {
     }
     }
 
-
     stop() {
         this.running = false;
         this.gameTimer.stop();
     }
-
 
     _setupWorld() {
 
@@ -823,8 +894,6 @@ class SpaceGame {
         } else {
             hitObs.dead = true;
             this.ship.hit();
-            this.hitSound.currentTime = 0;
-            this.hitSound.play();
 
             if (!this.ship.alive) {  // justo murió
                 this.gameTimer.stop(); 
@@ -845,8 +914,9 @@ class SpaceGame {
     if (this.ship.exploding) {
 
         if (!this._explosionPlayed) {
-        this.explosionSound.currentTime = 0;
         this.explosionSound.play();
+        this.explosionSound.currentTime = 0;
+
         this._explosionPlayed = true;
         }
 
@@ -916,13 +986,17 @@ class SpaceGame {
         this.ctx.fillRect(s.x, s.y - s.h/2, s.w, s.h);
     }
 
+    this.ctx.fillStyle = "white";
+    this.ctx.font = "20px Arial";
+    this.ctx.fillText("Dispara con [F]", 10, 590);
+
     // HUD
     this.ctx.fillStyle = "white";
     this.ctx.font = "18px Arial";
     this.ctx.fillText(`Score: ${this.ship.score}`, 18, 26);
     this.ctx.fillText(`Lives: ${this.ship.lives}`, 18, 48);
     this.ctx.fillText(`Time: ${this.gameTimer.getRemaining()}s`, 18, 70);
-}
+    }
 
 
     _flap() {
@@ -960,6 +1034,8 @@ class SpaceGame {
 
     _gameOver() {
         this._stopAllSounds();
+
+        this.menuMusic.play();
         // parar timer
         this.running = false;
         this.gameTimer.stop();
@@ -973,6 +1049,9 @@ class SpaceGame {
             this.pantallaJuego.style.display = 'none';
             perdedor.style.display = 'flex';
             document.getElementById('btn-volver-per')?.addEventListener('click', () => {
+                this.optionMusic.pause();
+                this.optionMusic.currentTime = 0;
+                this.optionMusic.play();
                 perdedor.style.display = 'none';
                 this.pantallaMenu.style.display = 'flex';
             });
@@ -982,6 +1061,9 @@ class SpaceGame {
             this.pantallaJuego.style.display = 'none';
             ganador.style.display = 'flex';
             document.getElementById('btn-volver-ga')?.addEventListener('click', () => {
+                this.optionMusic.pause();
+                this.optionMusic.currentTime = 0;
+                this.optionMusic.play();
                 ganador.style.display = 'none';
                 this.pantallaMenu.style.display = 'flex';
             });
@@ -996,23 +1078,36 @@ class SpaceGame {
 
 /* --------- Inicialización (reemplaza la creación anterior) --------- */
 let currentGame = null;
+
 document.addEventListener('DOMContentLoaded', () => {
-    // si ya tenías lógica de selección de personaje: la ignoramos aquí.
     currentGame = new SpaceGame();
 
-    // arrancar desde tu botón "Play"
     const btnPlay = document.getElementById('btn-play');
-    btnJugarSolo?.addEventListener('click', () => {
-        const pj = document.getElementById('pantalla-juego');
-        if (pj) pj.style.display = 'none';
-        const pjp = document.getElementById('pantalla-juego-principal');
-        if (pjp) pjp.style.display = 'none';
 
-        const jp = document.getElementById('juego-pantalla');
-        if (jp) jp.style.display = 'flex';
+    btnPlay.addEventListener('click', () => {
+        const pantallaJuegoActivo = document.getElementById('pantalla-juego-principal');
+        pantallaJuegoActivo.style.display = 'flex';
+
+        // reproducir música del menú
+        currentGame.menuMusic.play().catch(() => {
+            console.log("Requiere interacción del usuario para reproducir música");
+        });
+    });
+
+    const btnJugarSolo = document.getElementById('solo');
+    btnJugarSolo?.addEventListener('click', () => {
+        // ocultar menú
+        document.getElementById('pantalla-juego-principal').style.display = 'none';
+        document.getElementById('juego-pantalla').style.display = 'flex';
+
+        // pausa música del menú
+        currentGame.menuMusic.pause();
+        currentGame.menuMusic.currentTime = 0;
+
+        // reproducir música del juego
+        currentGame.gameMusic.play();
+
         currentGame.start();
     });
 });
-
-
 
