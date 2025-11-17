@@ -149,6 +149,8 @@ class Ship {
         this.lives = 3;
         this.score = 0;
 
+        this.hasBonus = false; // indica si tiene borde amarillo
+
         // animación de propulsores (supongamos 4 frames horizontales)
         this.flameFrames = 1;
         this.flameFrameTime = 0.06;
@@ -255,10 +257,45 @@ class Ship {
         } else {
             // dibujar normal
             ctx.drawImage(this.sprite, this.x - this.width/2, this.y - this.height/2, this.width, this.height);
+
+            if (this.hasBonus) {
+            // canvas temporal
+            const temp = document.createElement('canvas');
+            temp.width = this.width;
+            temp.height = this.height;
+            const tctx = temp.getContext('2d');
+
+            // dibujar nave normal
+            tctx.drawImage(this.sprite, 0, 0, this.width, this.height);
+
+            // dibujar flame si corresponde
+            if (this.vy < 0 || this.flameIndex !== 0) {
+                tctx.drawImage(this.activateSprites, 0, 0, this.width, this.height);
+            }
+
+            // aplicar rojo solo a los píxeles visibles
+            tctx.fillStyle = 'yellow';
+            tctx.globalAlpha = 0.6;
+            tctx.globalCompositeOperation = 'source-in';
+            tctx.fillRect(0, 0, this.width, this.height);
+
+            // dibujar en canvas principal
+            ctx.drawImage(temp, this.x - this.width/2, this.y - this.height/2);
+            }
+
             if (this.vy < 0 || this.flameIndex !== 0) {
                 ctx.drawImage(this.activateSprites, this.x - this.width/2, this.y - this.height/2, this.width, this.height);
             }
         }
+    }
+
+    grabBonus() {
+        this.hasBonus = true;
+
+        // Quitar el borde después de 1 segundo
+        setTimeout(() => {
+            this.hasBonus = false;
+        }, 1000);
     }
 
     getBounds() {
@@ -318,6 +355,96 @@ class Obstacle {
 }
 
 /* --------- Manager de Obstáculos --------- */
+// class ObstacleManager {
+//     constructor(canvas, assets) {
+//         this.canvas = canvas;
+//         this.assets = assets;
+//         this.obstacles = [];
+//         this.spawnTimer = 0;
+//         this.spawnInterval = 1.4;
+//         this.speedMultiplier = 1;
+//     }
+
+//     update(dt) {
+//         this.spawnTimer += dt;
+//         if (this.spawnTimer >= this.spawnInterval) {
+//             this.spawnTimer -= this.spawnInterval;
+//             this._spawnPair();
+//         }
+//         // update existing
+//         for (const o of this.obstacles) o.update(dt, this.speedMultiplier);
+//         // limpiar fuera de pantalla o muertos
+//         this.obstacles = this.obstacles.filter(o => (o.x + o.w > -50) && !o.dead);
+//     }
+
+//     _spawnPair() {
+//         const pipeW = 72;
+//         const gap = 200;              
+//         const minH = 120;                
+//         const maxH = this.canvas.height - gap - 300;
+
+//         // Generar topH con variación
+//         const prevY = this.lastY ?? (this.canvas.height / 2);
+//         const maxDesvio = 60;
+//         let topH = prevY + (Math.random() * 2 - 1) * maxDesvio;
+//         topH = Math.max(minH, Math.min(maxH, topH));
+//         this.lastY = topH;
+
+//         const xPos = this.canvas.width + 80;
+
+//         // crear tubos
+//         this.obstacles.push(new Obstacle(xPos, 0, pipeW, topH, "pipe"));
+//         this.obstacles.push(new Obstacle(xPos, topH + gap, pipeW, this.canvas.height - (topH + gap), "pipe"));
+
+//         // margen dentro del gap para enemigos
+//         if (Math.random() < 0.3) {
+//             const enemySize = 100; // tamaño del enemigo
+//             const safeTop = topH + 10;                  // margen superior
+//             const safeBottom = topH + gap - enemySize - 10; // margen inferior considerando tamaño del enemy
+
+//             const ey = safeTop + Math.random() * (safeBottom - safeTop);
+//             this.obstacles.push(new Obstacle(this.canvas.width + 120, ey, enemySize, enemySize, "enemy"));
+//         }
+
+//         // bonus centrado en la abertura
+//         if (Math.random() < 0.2) {
+//             const by = topH + gap / 2 - 18; 
+//             this.obstacles.push(new Obstacle(this.canvas.width + 200, by, 36, 36, "bonus"));
+//         }
+//     }
+
+
+//     draw(ctx) {
+//         for (const o of this.obstacles) o.draw(ctx, this.assets);
+//     }
+
+//     checkCollisions(ship) {
+//         const s = ship.getBounds();
+//         for (const o of this.obstacles) {
+//             const b = o.getBounds();
+//             if (this._intersectRect(s, b)) {
+//                 return o;
+//             }
+//         }
+//         return null;
+//     }
+
+//     _intersectRect(a, b) {
+//         return !(a.x + a.w < b.x || a.x > b.x + b.w || a.y + a.h < b.y || a.y > b.y + b.h);
+//     }
+
+//     shoot(x, y) {
+//         // simple: buscar primer obstáculo en línea de tiro y marcar dead
+//         for (const o of this.obstacles) {
+//             if (o.x < x + 300 && o.x > x && Math.abs((o.y + o.h/2) - y) < 60 && o.type !== "bonus") {
+//                 o.dead = true;
+//                 return true;
+//             }
+//         }
+//         return false;
+//     }
+// }
+
 class ObstacleManager {
     constructor(canvas, assets) {
         this.canvas = canvas;
@@ -334,19 +461,44 @@ class ObstacleManager {
             this.spawnTimer -= this.spawnInterval;
             this._spawnPair();
         }
-        // update existing
-        for (const o of this.obstacles) o.update(dt, this.speedMultiplier);
-        // limpiar fuera de pantalla o muertos
+
+        for (const o of this.obstacles) {
+        // enemigos con animación vertical
+        if (o.type === "enemy" && o.targetY !== undefined) {
+            // mover horizontal siempre
+            o.x -= 200 * dt * this.speedMultiplier;
+
+            // activar animación vertical solo cuando esté visible
+            if (!o.animating && o.x + o.w < this.canvas.width - 50) {
+                o.animating = true;
+            }
+
+
+            if (o.animating) {
+                const diff = o.targetY - o.y;
+                const speed = 300;
+                if (Math.abs(diff) < 1) {
+                    o.y = o.targetY;
+                    delete o.targetY;
+                    delete o.animating;
+                } else {
+                    o.y += Math.sign(diff) * Math.min(speed * dt, Math.abs(diff));
+                }
+            }
+        } else {
+            // objetos normales
+            o.update(dt, this.speedMultiplier);
+        }
+    }
         this.obstacles = this.obstacles.filter(o => (o.x + o.w > -50) && !o.dead);
     }
 
     _spawnPair() {
         const pipeW = 72;
-        const gap = 200;              
-        const minH = 120;                
+        const gap = 200;
+        const minH = 120;
         const maxH = this.canvas.height - gap - 300;
 
-        // Generar topH con variación
         const prevY = this.lastY ?? (this.canvas.height / 2);
         const maxDesvio = 60;
         let topH = prevY + (Math.random() * 2 - 1) * maxDesvio;
@@ -359,14 +511,17 @@ class ObstacleManager {
         this.obstacles.push(new Obstacle(xPos, 0, pipeW, topH, "pipe"));
         this.obstacles.push(new Obstacle(xPos, topH + gap, pipeW, this.canvas.height - (topH + gap), "pipe"));
 
-        // margen dentro del gap para enemigos
+        // enemigos dentro del gap
         if (Math.random() < 0.3) {
-            const enemySize = 100; // tamaño del enemigo
-            const safeTop = topH + 10;                  // margen superior
-            const safeBottom = topH + gap - enemySize - 10; // margen inferior considerando tamaño del enemy
-
+            const enemySize = 100;
+            const safeTop = topH + 10;
+            const safeBottom = topH + gap - enemySize - 10;
             const ey = safeTop + Math.random() * (safeBottom - safeTop);
-            this.obstacles.push(new Obstacle(this.canvas.width + 120, ey, enemySize, enemySize, "enemy"));
+
+            // enemigo empieza abajo del canvas y sube al target
+            const enemy = new Obstacle(this.canvas.width + 120, this.canvas.height + enemySize, enemySize, enemySize, "enemy");
+            enemy.targetY = ey;  // posición final
+            this.obstacles.push(enemy);
         }
 
         // bonus centrado en la abertura
@@ -376,18 +531,20 @@ class ObstacleManager {
         }
     }
 
-
     draw(ctx) {
-        for (const o of this.obstacles) o.draw(ctx, this.assets);
+    for (const o of this.obstacles) {
+        // Solo dibujar si visible
+        if (o.x + o.w > 0 && o.x < this.canvas.width) {
+            o.draw(ctx, this.assets);
+        }
     }
+}
 
     checkCollisions(ship) {
         const s = ship.getBounds();
         for (const o of this.obstacles) {
             const b = o.getBounds();
-            if (this._intersectRect(s, b)) {
-                return o;
-            }
+            if (this._intersectRect(s, b)) return o;
         }
         return null;
     }
@@ -397,7 +554,6 @@ class ObstacleManager {
     }
 
     shoot(x, y) {
-        // simple: buscar primer obstáculo en línea de tiro y marcar dead
         for (const o of this.obstacles) {
             if (o.x < x + 300 && o.x > x && Math.abs((o.y + o.h/2) - y) < 60 && o.type !== "bonus") {
                 o.dead = true;
@@ -407,6 +563,9 @@ class ObstacleManager {
         return false;
     }
 }
+
+
+
 
 /* --------- Game principal --------- */
 
@@ -660,6 +819,7 @@ class SpaceGame {
             this.ship.score += 10;
             this.bonusSound.currentTime = 0;
             this.bonusSound.play();
+            this.ship.grabBonus();
         } else {
             hitObs.dead = true;
             this.ship.hit();
@@ -672,7 +832,6 @@ class SpaceGame {
         }
         this._updateUI();
     }
-
 
     // puntuación
     for (const o of this.obManager.obstacles) {
