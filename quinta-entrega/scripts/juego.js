@@ -690,7 +690,7 @@ class SpaceGame {
         this.gameMusic.loop = true;
         this.gameMusic.volume = 0.1;
 
-        this.optionMusic = new Audio('/quinta-entrega/sounds/boton-ui.mp3');
+        this.optionMusic = new Audio('../sounds/boton-ui.mp3');
         this.gameMusic.loop = true;
         this.gameMusic.volume = 0.2;
 
