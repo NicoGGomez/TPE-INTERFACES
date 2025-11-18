@@ -63,7 +63,15 @@ btnJugarSolo && btnJugarSolo.addEventListener('click', () => {
     currentGame.optionMusic.play();
 });
 
+// btnSalir && btnSalir.addEventListener('click', () => {
+//     pantallaJuego.style.display = 'none';
+//     pantallaJuegoActivo.style.display = 'flex';
+//     clearInterval(timerInterval);
+//     timerEl.textContent = "⏱️ Tiempo: 120s";
+// });
+
 btnSalir && btnSalir.addEventListener('click', () => {
+    currentGame.running = false;
     pantallaJuego.style.display = 'none';
     pantallaJuegoActivo.style.display = 'flex';
     clearInterval(timerInterval);
@@ -678,7 +686,7 @@ class SpaceGame {
         this.enemyDestroySound = new Audio('https://www.myinstants.com/media/sounds/explosion.mp3'); // enemigo destruido
         this.enemyDestroySound.volume = 0.2;
 
-        this.hitSound = new Audio('/quinta-entrega/sounds/danio.mp3'); // daño al chocar
+        this.hitSound = new Audio('https://www.myinstants.com/media/sounds/danio.mp3'); // daño al chocar
         this.hitSound.volume = 0.4;
 
         // música
@@ -690,7 +698,7 @@ class SpaceGame {
         this.gameMusic.loop = true;
         this.gameMusic.volume = 0.1;
 
-        this.optionMusic = new Audio('../sounds/boton-ui.mp3');
+        this.optionMusic = new Audio('https://www.myinstants.com/media/sounds/botonui.mp3');
         this.gameMusic.loop = true;
         this.gameMusic.volume = 0.2;
 
@@ -730,6 +738,7 @@ class SpaceGame {
 
     _bindInput() {
         window.addEventListener('keydown', (e) => {
+            if (!this.running) return; 
             if (e.code === 'Space') { e.preventDefault(); this._flap(); }
             if (e.code === 'KeyF') this._shoot();
             if (e.code === 'Escape') {        // <--- nueva línea
