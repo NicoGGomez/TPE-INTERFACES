@@ -24,6 +24,8 @@ const botonAyuda = document.getElementById('ayuda');
 // Botón "Mezclar" vuelve a cargar la imagen seleccionada
 btnMezclar.addEventListener('click', () => {
     game.loadImage(url);
+    game.mezclaSound.currentTime = 0;
+    game.mezclaSound.play();
 }); 
 
 // Botón "Salir" vuelve a la pantalla de selección de modo
@@ -36,6 +38,8 @@ btnSalir.addEventListener('click', () => {
 botonAyuda.addEventListener("click", () => {
     if (botonAyuda.disabled) return;
 
+            game.magiaSound.currentTime = 0;
+            game.magiaSound.play();
             game.showHelp();
 
             // deshabilitar
@@ -155,7 +159,8 @@ class PuzzleGame {
         this.maxLevels = 3;
         this.rotatePiezaSound = new Audio('https://www.myinstants.com/media/sounds/bloqueee.mp3');
         this.rotatePiezaSound.volume = 1;
-        this.rotatePiezaSound = new Audio('https://www.myinstants.com/media/sounds/mezclar-40052.mp3');
+        this.mezclaSound = new Audio('https://www.myinstants.com/media/sounds/mezclaaaaaa.mp3');
+        this.magiaSound = new Audio('https://www.myinstants.com/media/sounds/magiaaaaaaaa.mp3');
 
 
         // Banco de imágenes disponibles
@@ -195,6 +200,7 @@ class PuzzleGame {
         this.canvas.addEventListener("contextmenu", e => {
             e.preventDefault();
             this.rotatePiece(e, 90); // clic derecho rota la pieza
+            this.rotatePiezaSound.currentTime = 0;
             this.rotatePiezaSound.play()
         });
     }
