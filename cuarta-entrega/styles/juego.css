@@ -409,7 +409,7 @@ canvas {
     user-select: none;
 }
 
-#btn-volver-ga, #btn-volver-per, #btn-img-volver, .btn-pieza-volver, #salir, #reiniciar, #volver-instrucciones, #volver-multijugador{
+#btn-volver-ga, #btn-volver-per, #btn-img-volver, .btn-pieza-volver, #salir, #reiniciar, #volver-instrucciones, #volver-multijugador, #ayuda{
     padding: 10px;
     background: none;
     border: none;
@@ -421,7 +421,7 @@ canvas {
     user-select: none;
 }
 
-#btn-volver-ga:hover, #btn-volver-per:hover, #btn-img-volver:hover , .btn-pieza-volver:hover, #salir:hover, #reinicar:hover, #volver-instrucciones:hover, #volver-multijugador:hover{
+#btn-volver-ga:hover, #btn-volver-per:hover, #btn-img-volver:hover , .btn-pieza-volver:hover, #salir:hover, #reinicar:hover, #volver-instrucciones:hover, #volver-multijugador:hover, #ayuda:hover{
     padding: 10px;
     background-color: rgba(0, 0, 0, 0.8);
     color: #ffffff;
@@ -429,6 +429,11 @@ canvas {
     border-radius: 10px;
     cursor: pointer;
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+#ayuda.disabled-hint {
+    opacity: 0.5;
+    pointer-events: none;
 }
 
 .btn-primario {

@@ -18,6 +18,8 @@ const btnVolverAtras = document.getElementById('btn-volver');
 const btnImgVolverAtras = document.getElementById('btn-img-volver');
 const btnSalir = document.getElementById('salir');
 const btnMezclar = document.getElementById('mezclar');
+const botonAyuda = document.getElementById('ayuda');
+
 
 // Botón "Mezclar" vuelve a cargar la imagen seleccionada
 btnMezclar.addEventListener('click', () => {
@@ -26,9 +28,27 @@ btnMezclar.addEventListener('click', () => {
 
 // Botón "Salir" vuelve a la pantalla de selección de modo
 btnSalir.addEventListener('click', () => {
+    game.endGame();
     pantallaSolo.style.display = 'flex';
     pantallaJuego.style.display = 'none';
 });
+
+botonAyuda.addEventListener("click", () => {
+    if (botonAyuda.disabled) return;
+
+            game.showHelp();
+
+            // deshabilitar
+            botonAyuda.disabled = true;
+            botonAyuda.classList.add('disabled-hint');
+
+            // volver a habilitar en 10 segundos
+            setTimeout(() => {
+                botonAyuda.disabled = false;
+                botonAyuda.classList.remove('disabled-hint');
+            }, 10000);
+});
+
 
 // ------------------- Pantallas -------------------
 const pantallaSolo = document.getElementById('solitario');
@@ -94,6 +114,7 @@ let url = null;
     ];
     img.addEventListener('click', () => {
         url = urls[index];
+        game.isActive = true;
         pantallaSolo.style.display = 'none';
         document.getElementById('panel-piezas').style.display = 'flex';
     });
@@ -110,6 +131,7 @@ panelPiezas.addEventListener('submit', function (e) {
     game.gridSize = grid;
     game.currentLevel = 1;
     game.baseGridSize = null;
+    game.isActive = true;
     game.loadLevel();
 });
 
@@ -131,6 +153,10 @@ class PuzzleGame {
         this.timerInterval = null;
         this.currentLevel = 1;
         this.maxLevels = 3;
+        this.rotatePiezaSound = new Audio('https://www.myinstants.com/media/sounds/bloqueee.mp3');
+        this.rotatePiezaSound.volume = 1;
+        this.rotatePiezaSound = new Audio('https://www.myinstants.com/media/sounds/mezclar-40052.mp3');
+
 
         // Banco de imágenes disponibles
         this.imageBank = [
@@ -145,6 +171,22 @@ class PuzzleGame {
         this.bindEvents(); // Enlaza eventos del mouse
     }
 
+    showHelp() {
+        if (!this.isActive) return;
+
+        // mostrar en color
+        this.draw(true);
+
+        // cancelar si ya hay un timeout
+        clearTimeout(this.helpTimeout);
+
+        // volver al modo normal después de 5s
+        this.helpTimeout = setTimeout(() => {
+            this.draw(false);
+        }, 3000);
+    }
+
+
     // Asocia eventos de arrastre y rotación de piezas
     bindEvents() {
         this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this));
@@ -153,6 +195,7 @@ class PuzzleGame {
         this.canvas.addEventListener("contextmenu", e => {
             e.preventDefault();
             this.rotatePiece(e, 90); // clic derecho rota la pieza
+            this.rotatePiezaSound.play()
         });
     }
 
@@ -292,53 +335,78 @@ class PuzzleGame {
                 break;
             }
         }
+        this.rotatePiezaSound.play()
         this.draw();
         this.checkWin();
     }
 
-    // Comprueba si el puzzle está completo
     checkWin() {
-        const complete = this.pieces.every(p => p.rotation === 0) &&
-            this.pieces.every(p => Math.abs(p.x - p.correctX) < 8 && Math.abs(p.y - p.correctY) < 8);
 
-        if (complete) {
-            this.isActive = false;
+    if (!this.isActive) return;
+    const complete =
+        this.pieces.every(p => p.rotation === 0) &&
+        this.pieces.every(
+            p =>
+                Math.abs(p.x - p.correctX) < 8 &&
+                Math.abs(p.y - p.correctY) < 8
+        );
+
+    if (!complete) return;
+
+    this.isActive = false;
+    this.stopTimer();
+
+    const elapsed = ((Date.now() - this.startTime) / 1000).toFixed(1);
+
+    // ❌ cancelar timeouts anteriores (si los hay)
+    clearTimeout(this.timeout1);
+    clearTimeout(this.timeout2);
+
+    // mostrar el puzzle en color
+    this.draw(true);
+
+    // --- TIMEOUT 1 ---
+    this.timeout1 = setTimeout(() => {
+        const ganador = document.getElementById('ganador');
+        const miDiv = document.getElementById('miDiv');
+
+        miDiv.innerHTML = `<p>¡Nivel ${this.currentLevel}/3 completado! Tiempo: ${elapsed}s</p>`;
+        ganador.style.display = 'flex';
+        pantallaJuego.style.display = 'none';
+
+        // botón para volver atrás
+        btnVolverAtras.onclick = () => {
+            ganador.style.display = 'none';
+            pantallaJuego.style.display = 'none';
+            pantallaSolo.style.display = 'flex';
+            this.endGame()
+        };
+
+        // --- TIMEOUT 2 ---
+        this.timeout2 = setTimeout(() => {
+            ganador.style.display = 'none';
             this.stopTimer();
-            const elapsed = ((Date.now() - this.startTime) / 1000).toFixed(1);
 
-            // Muestra imagen a color y luego cartel de victoria
-            this.draw(true);
-            setTimeout(() => {
-                const ganador = document.getElementById('ganador');
-                const miDiv = document.getElementById('miDiv');
-                miDiv.innerHTML = `<p>¡Nivel ${this.currentLevel}/3 completado! Tiempo: ${elapsed}s</p>`;
-                ganador.style.display = 'flex';
+            // 🔥 SOLUCIÓN CLAVE 🔥  
+            pantallaJuego.style.display = 'flex';  // ← VOLVEMOS A MOSTRAR EL CANVAS
+
+            if (this.currentLevel < this.maxLevels) {
+                this.currentLevel++;
+                this.ctx.clearRect(0, 0, this.size, this.size);
+                this.isActive = true;     // ← REACTIVA EL JUEGO
+                this.loadLevel();
+            } else {
                 pantallaJuego.style.display = 'none';
+                pantallaSolo.style.display = 'flex';
+                this.ctx.clearRect(0, 0, this.size, this.size);
+            }
 
-                // Botón volver al menú
-                btnVolverAtras.onclick = () => {
-                    ganador.style.display = 'none';
-                    pantallaJuego.style.display = 'none';
-                    pantallaSolo.style.display = 'flex';
-                };
+        }, 2500);
 
-                // Avanza al siguiente nivel o vuelve al menú
-                setTimeout(() => {
-                    ganador.style.display = 'none';
-                    pantallaJuego.style.display = 'flex';
-                    if (this.currentLevel < this.maxLevels) {
-                        this.currentLevel++;
-                        this.ctx.clearRect(0, 0, this.size, this.size);
-                        this.loadLevel();
-                    } else {
-                        pantallaJuego.style.display = 'none';
-                        pantallaSolo.style.display = 'flex';
-                        this.ctx.clearRect(0, 0, this.size, this.size);
-                    }
-                }, 2500);
-            }, 2000);
-        }
+
+    }, 2000);
     }
+
 
     // Inicia temporizador
     startTimer() {
@@ -358,6 +426,14 @@ class PuzzleGame {
     // Devuelve imagen aleatoria del banco
     getRandomImage() {
         return this.imageBank[Math.floor(Math.random() * this.imageBank.length)];
+    }
+
+    endGame() {
+    this.isActive = false;
+    this.stopTimer();       
+    clearTimeout(this.timeout1);
+    clearTimeout(this.timeout2);
+    this.ctx.clearRect(0, 0, this.size, this.size); 
     }
 }
 

@@ -406,16 +406,25 @@ class PegBoard {
     }
 
     onMouseUp(clientX, clientY, onMoveMade = () => {}) {
-    if (!this.dragging) return;
-    const from = this.dragging.from;
-    const cell = this.getCellFromCoords(clientX, clientY);
-    if (cell && this.isValidMove(from, cell)) {
-        this.makeMove(from, cell);
-        onMoveMade();
+        if (!this.dragging) return;
+        const from = this.dragging.from;
+        const cell = this.getCellFromCoords(clientX, clientY);
+
+        if (cell && this.isValidMove(from, cell)) {
+            // snapshot ANTES de modificar el tablero
+            const prevBoard = this.board.map(row => [...row]);
+
+            // aplicar movimiento
+            this.makeMove(from, cell);
+
+            // informar que se hizo un movimiento y pasar prevBoard
+            onMoveMade(prevBoard);
+        }
+
+        this.dragging = null;
+        this.hints = []; // limpia los hints
     }
-    this.dragging = null;
-    this.hints = []; // <-- limpia los hints
-    }
+
 
     hasMovesLeft() {
     for (let y = 0; y < 7; y++) {
@@ -455,11 +464,13 @@ class PegSolitaireGame {
         this.btnPlay = document.getElementById('btn-play');
         this.btnReiniciar = document.getElementById('reiniciar');
         this.btnSalir = document.getElementById('salir');
+        this.btnAyuda = document.getElementById('ayuda');
 
         this.img = ''
         this.assets = new Assets();
         this.board = new PegBoard(this.canvas, this.assets, 50);
         this.timer = new GameTimer(this.timerEl, 120, this.onTimeUp.bind(this));
+        this.moveHistory = [];
 
         this._bindUI();
         this._bindCanvasEvents();
@@ -467,12 +478,30 @@ class PegSolitaireGame {
 
     _bindUI() {
         this.btnReiniciar?.addEventListener('click', () => {
+            this.moveHistory = [];
             this.startGame();
         });
         this.btnSalir?.addEventListener('click', () => {
+            this.moveHistory = [];
             this.pantallaJuego.style.display = 'none';
             this.pantallaMenu.style.display = 'flex';
             this.stopGame();
+        });
+        this.btnAyuda?.addEventListener('click', () => {
+            
+            if (this.btnAyuda.disabled) return;
+
+            this.restoreLastMove();
+
+            // deshabilitar
+            this.btnAyuda.disabled = true;
+            this.btnAyuda.classList.add('disabled-hint');
+
+            // volver a habilitar en 10 segundos
+            setTimeout(() => {
+                this.btnAyuda.disabled = false;
+                this.btnAyuda.classList.remove('disabled-hint');
+            }, 10000);
         });
     }
 
@@ -486,9 +515,13 @@ class PegSolitaireGame {
         this.canvas.addEventListener('mousemove', (e) => {
             if (isDown) this.board.onMouseMove(e.clientX, e.clientY);
         });
+
         this.canvas.addEventListener('mouseup', (e) => {
             isDown = false;
-            this.board.onMouseUp(e.clientX, e.clientY, () => {
+            this.board.onMouseUp(e.clientX, e.clientY, (prevBoard) => {
+                // guardamos el snapshot PREVIO al movimiento
+                this.moveHistory.push(prevBoard);
+
                 if (this.board.checkWin()) {
                     this.onWin();
                 } else if (!this.board.hasMovesLeft()) {
@@ -506,9 +539,14 @@ class PegSolitaireGame {
             const t = e.touches[0];
             this.board.onMouseMove(t.clientX, t.clientY);
         });
+
         this.canvas.addEventListener('touchend', (e) => {
+            isDown = false;
             const t = e.changedTouches[0];
-            this.board.onMouseUp(t.clientX, t.clientY, () => {
+            this.board.onMouseUp(t.clientX, t.clientY, (prevBoard) => {
+                // guardamos el snapshot PREVIO al movimiento
+                this.moveHistory.push(prevBoard);
+
                 if (this.board.checkWin()) {
                     this.onWin();
                 } else if (!this.board.hasMovesLeft()) {
@@ -516,7 +554,8 @@ class PegSolitaireGame {
                 }
             });
         });
-    
+
+
     }
 
     async startGame() {
@@ -525,6 +564,7 @@ class PegSolitaireGame {
         this.board.initBoard();
         this.timer.start();
         this.board.startAnimationLoop();
+        this.moveHistory = [];
     }
 
     stopGame() {
@@ -547,6 +587,7 @@ class PegSolitaireGame {
     }
 
     onWin() {
+        this.moveHistory = [];
         this.timer.stop();
         // alert(`🎉 ¡Ganaste con ${this.timer.getRemaining()}s restantes!`);
         // this.stopGame();
@@ -562,6 +603,7 @@ class PegSolitaireGame {
     }
 
     onLose() {
+        this.moveHistory = [];
         this.timer.stop();
         // alert("💀 No quedan más movimientos. ¡Perdiste!");
         const perdedor = document.getElementById('perdedor'); // Obtiene el elemento que muestra la pantalla de perdedor
@@ -575,5 +617,19 @@ class PegSolitaireGame {
             this.pantallaMenu.style.display = 'flex'; 
         })
     }
+
+    saveBoardState() {
+        const copy = this.board.board.map(row => [...row]);
+        this.moveHistory.push(copy);
+    }
+
+    restoreLastMove() {
+        if (this.moveHistory.length === 0) return;
+
+        const lastState = this.moveHistory.pop();
+        this.board.board = lastState.map(row => [...row]);
+        this.board.draw();
+    }
+
 
 }
