@@ -63,12 +63,6 @@ btnJugarSolo && btnJugarSolo.addEventListener('click', () => {
     currentGame.optionMusic.play();
 });
 
-// btnSalir && btnSalir.addEventListener('click', () => {
-//     pantallaJuego.style.display = 'none';
-//     pantallaJuegoActivo.style.display = 'flex';
-//     clearInterval(timerInterval);
-//     timerEl.textContent = "⏱️ Tiempo: 120s";
-// });
 
 btnSalir && btnSalir.addEventListener('click', () => {
     currentGame.running = false;
@@ -100,8 +94,10 @@ class GameAssets {
             ship_sprites: "https://i.postimg.cc/qMVvbvtt/ship-sprites.png", ship_activate_sprites: "https://i.postimg.cc/w1y5MRTk/descarga.png", // sprite: flame frames + ship
             explosion_sprites: "https://i.postimg.cc/R6gc3S7n/cc572ebb-fb41-4e70-aeff-e309b344893d-removebg-preview.png",
             enemy_sprite: "https://i.postimg.cc/pmbrQmBN/descarga-(1).png",
+            enemy2_sprite: "https://i.postimg.cc/qzBmJ0xR/Untitled-Project-removebg-preview.png",
             cloud_sprite: "https://i.postimg.cc/p5thWkLh/Generated-Image-November-16-2025-7-51PM-removebg-preview.png",
-            bonus_sprite: "https://i.postimg.cc/3kPs078r/bonus-sprite-removebg-preview.png"
+            bonus_sprite: "https://i.postimg.cc/dLQWsvjQ/Untitled-Project-3-removebg-preview.png",
+            powerup_sprite: "https://i.postimg.cc/3kPs078r/bonus-sprite-removebg-preview.png"
         };
     }
 
@@ -195,6 +191,10 @@ class Ship {
         this.damageTimer = 0;
         this.damageDuration = 0.1;
 
+        this.invincible = false;
+        this.invincibleTimer = 0;
+        this.invincibleDuration = 5; // segundos
+
         this._prepareRedSprite(); // precalcular versión roja
     }
 
@@ -226,6 +226,15 @@ class Ship {
 
     update(dt) {
         if (!this.alive) return;
+
+        // reducir timer de invencibilidad
+        if (this.invincible) {
+            this.invincibleTimer -= dt;
+            if (this.invincibleTimer <= 0) {
+                this.invincible = false;
+            }
+        }
+
         // física vertical
         this.vy += this.gravity * dt;
         if (this.vy > this.maxFallSpeed) this.vy = this.maxFallSpeed;
@@ -257,8 +266,37 @@ class Ship {
         }
     }
 
+    grabPowerup() {
+        this.invincible = true;
+        this.invincibleTimer = this.invincibleDuration;
+    }
+
+    hit() {
+        if (this.invincible) return; // ignora daño si es invencible
+        this.lives--;
+        this.damageTimer = this.damageDuration;
+        if (this.lives <= 0) {
+            this.alive = false;
+            this.exploding = true;
+            this.explosionTimer = 0;
+        }
+    }
+
     draw(ctx) {
         if (this.exploding) return;
+
+        if (this.invincible) {
+            const temp = document.createElement('canvas');
+            temp.width = this.width;
+            temp.height = this.height;
+            const tctx = temp.getContext('2d');
+            tctx.drawImage(this.sprite, 0, 0, this.width, this.height);
+            tctx.fillStyle = 'cyan';
+            tctx.globalAlpha = 0.5;
+            tctx.globalCompositeOperation = 'source-in';
+            tctx.fillRect(0, 0, this.width, this.height);
+            ctx.drawImage(temp, this.x - this.width/2, this.y - this.height/2);
+        }
 
         if (this.damageTimer > 0) {
             // canvas temporal
@@ -380,102 +418,26 @@ class Obstacle {
             else {
                 ctx.fillStyle = "gold";
                 ctx.fillRect(this.x, this.y, this.w, this.h);
-            }
-        }
+            } 
+        } else if (this.type === "enemy2") {
+                const img = assets.images.enemy2_sprite;
+                if (img) ctx.drawImage(img, this.x, this.y, this.w, this.h);
+                else {
+                    ctx.fillStyle = "#FF00FF";
+                    ctx.fillRect(this.x, this.y, this.w, this.h);
+                }
+        } else if (this.type === "powerup") {
+                const img = assets.images.powerup_sprite;
+                if (img) ctx.drawImage(img, this.x, this.y, this.w, this.h);
+                else {
+                    ctx.fillStyle = "#FFF";
+                    ctx.fillRect(this.x, this.y, this.w, this.h);
+                }
+        }   
     }
     getBounds() { return { x: this.x, y: this.y, w: this.w, h: this.h }; }
 }
 
-/* --------- Manager de Obstáculos --------- */
-// class ObstacleManager {
-//     constructor(canvas, assets) {
-//         this.canvas = canvas;
-//         this.assets = assets;
-//         this.obstacles = [];
-//         this.spawnTimer = 0;
-//         this.spawnInterval = 1.4;
-//         this.speedMultiplier = 1;
-//     }
-
-//     update(dt) {
-//         this.spawnTimer += dt;
-//         if (this.spawnTimer >= this.spawnInterval) {
-//             this.spawnTimer -= this.spawnInterval;
-//             this._spawnPair();
-//         }
-//         // update existing
-//         for (const o of this.obstacles) o.update(dt, this.speedMultiplier);
-//         // limpiar fuera de pantalla o muertos
-//         this.obstacles = this.obstacles.filter(o => (o.x + o.w > -50) && !o.dead);
-//     }
-
-//     _spawnPair() {
-//         const pipeW = 72;
-//         const gap = 200;              
-//         const minH = 120;                
-//         const maxH = this.canvas.height - gap - 300;
-
-//         // Generar topH con variación
-//         const prevY = this.lastY ?? (this.canvas.height / 2);
-//         const maxDesvio = 60;
-//         let topH = prevY + (Math.random() * 2 - 1) * maxDesvio;
-//         topH = Math.max(minH, Math.min(maxH, topH));
-//         this.lastY = topH;
-
-//         const xPos = this.canvas.width + 80;
-
-//         // crear tubos
-//         this.obstacles.push(new Obstacle(xPos, 0, pipeW, topH, "pipe"));
-//         this.obstacles.push(new Obstacle(xPos, topH + gap, pipeW, this.canvas.height - (topH + gap), "pipe"));
-
-//         // margen dentro del gap para enemigos
-//         if (Math.random() < 0.3) {
-//             const enemySize = 100; // tamaño del enemigo
-//             const safeTop = topH + 10;                  // margen superior
-//             const safeBottom = topH + gap - enemySize - 10; // margen inferior considerando tamaño del enemy
-
-//             const ey = safeTop + Math.random() * (safeBottom - safeTop);
-//             this.obstacles.push(new Obstacle(this.canvas.width + 120, ey, enemySize, enemySize, "enemy"));
-//         }
-
-//         // bonus centrado en la abertura
-//         if (Math.random() < 0.2) {
-//             const by = topH + gap / 2 - 18; 
-//             this.obstacles.push(new Obstacle(this.canvas.width + 200, by, 36, 36, "bonus"));
-//         }
-//     }
-
-
-//     draw(ctx) {
-//         for (const o of this.obstacles) o.draw(ctx, this.assets);
-//     }
-
-//     checkCollisions(ship) {
-//         const s = ship.getBounds();
-//         for (const o of this.obstacles) {
-//             const b = o.getBounds();
-//             if (this._intersectRect(s, b)) {
-//                 return o;
-//             }
-//         }
-//         return null;
-//     }
-
-//     _intersectRect(a, b) {
-//         return !(a.x + a.w < b.x || a.x > b.x + b.w || a.y + a.h < b.y || a.y > b.y + b.h);
-//     }
-
-//     shoot(x, y) {
-//         // simple: buscar primer obstáculo en línea de tiro y marcar dead
-//         for (const o of this.obstacles) {
-//             if (o.x < x + 300 && o.x > x && Math.abs((o.y + o.h/2) - y) < 60 && o.type !== "bonus") {
-//                 o.dead = true;
-//                 return true;
-//             }
-//         }
-//         return false;
-//     }
-// }
 
 class ObstacleManager {
     constructor(canvas, assets) {
@@ -556,11 +518,27 @@ class ObstacleManager {
             this.obstacles.push(enemy);
         }
 
+        if (Math.random() < 0.3) {  // probabilidad de aparecer
+            const py = topH + gap / 2 - 18; 
+            this.obstacles.push(new Obstacle(this.canvas.width + 200, py, 36, 36, "powerup"));
+        }
+
+        if (Math.random() < 0.2) {
+            const size = 80;
+            const ey = topH + gap / 2 - size / 2;
+
+            const enemy2 = new Obstacle(this.canvas.width + 200, ey, size, size, "enemy2");
+            enemy2.speed = 350; // más rápido
+
+            this.obstacles.push(enemy2);
+        }
+
         // bonus centrado en la abertura
         if (Math.random() < 0.2) {
             const by = topH + gap / 2 - 18; 
             this.obstacles.push(new Obstacle(this.canvas.width + 200, by, 36, 36, "bonus"));
         }
+
     }
 
     draw(ctx) {
@@ -866,26 +844,31 @@ class SpaceGame {
 
     for (let i = this.shots.length - 1; i >= 0; i--) {
     const s = this.shots[i];
-        s.x += this.shotSpeed * dt;
-        // colisiones con enemigos
-        for (let j = 0; j < this.obManager.obstacles.length; j++) {
-            const o = this.obManager.obstacles[j];
-            const b = o.getBounds();
-            if (!o.dead && o.type === "enemy" &&
-                s.x + s.w > b.x && s.x < b.x + b.w &&
-                s.y + s.h/2 > b.y && s.y - s.h/2 < b.y + b.h) {
-                
-                o.dead = true;
-                this.ship.score += 2;
+    s.x += this.shotSpeed * dt;
 
-                // sonido de enemigo destruido
-                this.enemyDestroySound.currentTime = 0;
-                this.enemyDestroySound.play();
-            }
+    for (let j = 0; j < this.obManager.obstacles.length; j++) {
+        const o = this.obManager.obstacles[j];
+        const b = o.getBounds();
+
+        if (!o.dead && (o.type === "enemy" || o.type === "enemy2") &&
+            s.x + s.w > b.x && s.x < b.x + b.w &&
+            s.y + s.h/2 > b.y && s.y - s.h/2 < b.y + b.h) {
+            
+            o.dead = true;
+            this.ship.score += 2;
+
+            // reproducir sonido de enemigo destruido
+            this.enemyDestroySound.currentTime = 0;
+            this.enemyDestroySound.play();
+
+            // eliminar el disparo
+            this.shots.splice(i, 1);
+            break; // salir del loop de obstáculos
         }
-        if (s.x > this.canvas.width) this.shots.splice(i, 1);
     }
 
+    if (s.x > this.canvas.width) this.shots.splice(i, 1);
+}
 
     // actualizar mundo
     this.layers.forEach(l => l.update(dt));
@@ -900,13 +883,16 @@ class SpaceGame {
             this.bonusSound.currentTime = 0;
             this.bonusSound.play();
             this.ship.grabBonus();
+        } else if (hitObs.type === "powerup") {
+            hitObs.dead = true;
+            this.ship.lives += 1
+            this.ship.grabPowerup(); // invencible 5s
+            this.bonusSound.currentTime = 0;
+            this.bonusSound.play();
         } else {
             hitObs.dead = true;
             this.ship.hit();
-
-            if (!this.ship.alive) {  // justo murió
-                this.gameTimer.stop(); 
-            }
+            if (!this.ship.alive) this.gameTimer.stop();
         }
         this._updateUI();
     }
