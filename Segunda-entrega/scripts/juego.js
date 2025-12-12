@@ -31,6 +31,7 @@ btnMezclar.addEventListener('click', () => {
 // Botón "Salir" vuelve a la pantalla de selección de modo
 btnSalir.addEventListener('click', () => {
     game.endGame();
+    game.optionMusic.play()
     pantallaSolo.style.display = 'flex';
     pantallaJuego.style.display = 'none';
 });
@@ -63,9 +64,11 @@ const pantallaJuego = document.getElementById('juego-pantalla');
 // ------------------- Instrucciones -------------------
 // Muestra la pantalla de instrucciones y botón para volver
 btnInstrucciones.addEventListener('click', () => {
+    game.optionMusic.play()
     pantallaJuegoActivo.style.display = 'none';
     pantallaInstrucciones.style.display = 'flex';
     document.getElementById('volver-instrucciones').addEventListener('click', () => {
+        game.optionMusic.play()
         pantallaJuegoActivo.style.display = 'flex';
         pantallaInstrucciones.style.display = 'none';
     });
@@ -74,9 +77,11 @@ btnInstrucciones.addEventListener('click', () => {
 // ------------------- Multijugador -------------------
 // Muestra pantalla multijugador y botón para volver
 btnMultijugador.addEventListener('click', () => {
+    game.optionMusic.play()
     pantallaJuegoActivo.style.display = 'none';
     pantallaMultijugador.style.display = 'flex';
     document.getElementById('volver-multijugador').addEventListener('click', () => {
+        game.optionMusic.play()
         pantallaJuegoActivo.style.display = 'flex';
         pantallaMultijugador.style.display = 'none';
     });
@@ -85,6 +90,7 @@ btnMultijugador.addEventListener('click', () => {
 // ------------------- Solitario -------------------
 // Muestra pantalla de selección de imagen
 btnJugarSolo.addEventListener('click', () => {
+    game.optionMusic.play()
     pantallaJuegoActivo.style.display = 'none';
     pantallaSolo.style.display = 'flex';
 });
@@ -99,6 +105,7 @@ const imag6 = document.getElementById('imagen6');
 
 // Botón "volver" desde la selección de imagen al menú principal
 btnImgVolverAtras.addEventListener('click', () => {
+    game.optionMusic.play()
     pantallaSolo.style.display = 'none';
     pantallaJuegoActivo.style.display = 'flex';
 });
@@ -117,6 +124,7 @@ let url = null;
         'https://i.postimg.cc/k540g1Dg/img6.jpg'
     ];
     img.addEventListener('click', () => {
+        game.optionMusic.play()
         url = urls[index];
         game.isActive = true;
         pantallaSolo.style.display = 'none';
@@ -128,6 +136,7 @@ let url = null;
 // Toma el tamaño seleccionado, inicia el juego y carga el nivel
 const panelPiezas = document.getElementById('panel-piezas');
 panelPiezas.addEventListener('submit', function (e) {
+    game.optionMusic.play()
     e.preventDefault();
     panelPiezas.style.display = 'none';
     pantallaJuego.style.display = 'flex';
@@ -161,7 +170,9 @@ class PuzzleGame {
         this.rotatePiezaSound.volume = 1;
         this.mezclaSound = new Audio('https://www.myinstants.com/media/sounds/mezclaaaaaa.mp3');
         this.magiaSound = new Audio('https://www.myinstants.com/media/sounds/magiaaaaaaaa.mp3');
-
+        this.optionMusic = new Audio('https://www.myinstants.com/media/sounds/botonui.mp3');
+        this.winMusic = new Audio('https://www.myinstants.com/media/sounds/ddsssssssssad.mp3');
+        this.loseMusic = new Audio('https://www.myinstants.com/media/sounds/persiteeeeeeeeeee.mp3');
 
         // Banco de imágenes disponibles
         this.imageBank = [
@@ -376,6 +387,7 @@ class PuzzleGame {
         const ganador = document.getElementById('ganador');
         const miDiv = document.getElementById('miDiv');
 
+        this.winMusic.play()
         miDiv.innerHTML = `<p>¡Nivel ${this.currentLevel}/3 completado! Tiempo: ${elapsed}s</p>`;
         ganador.style.display = 'flex';
         pantallaJuego.style.display = 'none';
@@ -393,8 +405,7 @@ class PuzzleGame {
             ganador.style.display = 'none';
             this.stopTimer();
 
-            // 🔥 SOLUCIÓN CLAVE 🔥  
-            pantallaJuego.style.display = 'flex';  // ← VOLVEMOS A MOSTRAR EL CANVAS
+            pantallaJuego.style.display = 'flex'; 
 
             if (this.currentLevel < this.maxLevels) {
                 this.currentLevel++;
